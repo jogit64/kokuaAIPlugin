@@ -111,7 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function sendText(text) {
-        fetch('https://iajohannr01-579432f1d7c6.herokuapp.com/ask', {
+        fetch('https://kokua060424-caea7e92447d.herokuapp.com/ask', {
+
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
