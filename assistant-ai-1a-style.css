@@ -1,0 +1,70 @@
+#assistant1a-form {
+  display: flex;
+  align-items: center;
+}
+
+#assistant1a-question {
+  flex-grow: 1;
+  margin-right: 8px; /* Ajoutez une marge entre l'input et les boutons */
+}
+
+#assistant1a-submit,
+#assistant1a-record,
+#assistant1a-stop {
+  margin-left: 4px;
+}
+
+#assistant1a-question {
+  font-size: 16px; /* Taille de la police */
+  color: black; /* Couleur du texte */
+  padding: 10px; /* Espacement intérieur */
+}
+#assistant1a-submit.active {
+  background-color: red;
+  color: white;
+}
+
+#assistant1a-submit:not(.active) {
+  background-color: blue;
+  color: white;
+}
+
+#assistant1a-submit {
+  background-color: blue;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+#assistant1a-record {
+  transition: background-color 0.5s ease; /* Transition douce pour le changement de couleur */
+  background-color: blue; /* Couleur de fond */
+  color: white; /* Couleur du texte */
+  padding: 10px 20px; /* Espacement intérieur */
+  border: none; /* Pas de bordure */
+  cursor: pointer; /* Curseur pointeur */
+}
+
+#assistant1a-record.recording {
+  background-color: #ff0000; /* Rouge */
+  color: #ffffff; /* Texte blanc */
+}
+#assistant1a-stop {
+  display: none; /* Initialement masqué */
+  background-color: red; /* Rouge pour l'arrêt */
+  color: white; /* Texte blanc */
+  padding: 10px 20px; /* Espacement intérieur */
+  border: none; /* Pas de bordure */
+  cursor: pointer; /* Curseur pointeur */
+}
+
+#assistant1a-response {
+  font-family: Arial, sans-serif; /* Police de caractères */
+  color: white; /* Couleur du texte */
+}
+
+#assistant1a-record img {
+  width: 24px; /* Ajustez la largeur selon vos besoins */
+  height: auto; /* Gardez le ratio de l'image */
+}
