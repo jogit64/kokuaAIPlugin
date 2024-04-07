@@ -1,6 +1,9 @@
 #assistant1a-form {
   display: flex;
-  align-items: center;
+  /* align-items: center; */
+
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 #assistant1a-question {
@@ -19,6 +22,28 @@
   color: black; /* Couleur du texte */
   padding: 10px; /* Espacement intérieur */
 }
+
+#assistant1a-file-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  /* align-items: flex-end; */
+  margin-top: 20px;
+  width: 100%;
+}
+/* ! input Choisir fichierr */
+
+#assistant1a-file {
+  /* flex-grow: 1; */
+  justify-content: flex-start;
+  margin-right: 8px;
+  padding: 10px 20px;
+  color: #ffffff;
+  background-color: #485563;
+}
+
+/* ! bouton Demander */
+
 #assistant1a-submit.active {
   background-color: red;
   color: white;
@@ -35,6 +60,23 @@
   padding: 10px 20px;
   border: none;
   cursor: pointer;
+}
+
+/* ! bouton envoyer fichier */
+
+#assistant1a-file-submit {
+  background-color: blue; /* Couleur de fond identique à celle du bouton Demander */
+  color: white; /* Couleur du texte en blanc */
+  padding: 10px 20px; /* Padding identique au bouton Demander */
+  border: none; /* Aucune bordure */
+  cursor: pointer; /* Style de curseur identique */
+  margin-left: 4px; /* Assurez-vous d'avoir un peu d'espace entre les éléments */
+}
+
+/* Vous pouvez ajouter une classe spécifique pour le bouton non actif si nécessaire */
+#assistant1a-file-submit:not(.active) {
+  background-color: blue; /* Couleur de fond pour l'état non actif */
+  /* Ajouter d'autres styles pour l'état non actif si nécessaire */
 }
 
 #assistant1a-record {

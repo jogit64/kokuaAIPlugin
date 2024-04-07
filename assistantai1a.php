@@ -53,17 +53,29 @@ function assistant1a_shortcode()
 {
     ob_start(); // Commence la capture de sortie
     ?>
-<div id="assistant1a-form" style="display: flex; align-items: center;">
-    <input type="text" id="assistant1a-question" placeholder="Posez votre question ici..." style="flex-grow: 1;">
-    <button id="assistant1a-submit" disabled>Envoyer</button>
-    <!-- Utilisation d'une icône pour le bouton (remplacez par votre propre icône) -->
-    <button id="assistant1a-record">
-        <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
-    </button>
-    <button id="assistant1a-stop" style="display:none;">Arrêter</button>
-</div>
+<form id="assistant1a-form" enctype="multipart/form-data" method="post">
+    <div style="display: flex; width: 100%; align-items: center;">
+        <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."
+            style="flex-grow: 1; margin-right: 8px;">
+        <button type="button" id="assistant1a-submit" disabled>Demander</button>
+        <button type="button" id="assistant1a-record">
+            <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
+        </button>
+        <button type="button" id="assistant1a-stop" style="display:none;">Arrêter</button>
+    </div>
+
+    <!-- Séparation claire de la section d'envoi de fichier -->
+    <div id="assistant1a-file-section">
+        <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
+        <button type="button" id="assistant1a-file-submit" class="not-active">Envoyer le fichier</button>
+    </div>
+</form>
+<div id="assistant1a-response"></div> <!-- Réponse affichée ici -->
+
 
 <div id="assistant1a-response"></div> <!-- Réponse affichée ici -->
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var synth = window.speechSynthesis;
@@ -111,26 +123,35 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function sendText(text) {
-        fetch('https://kokua060424-caea7e92447d.herokuapp.com/ask', {
+        var formData = new FormData();
+        formData.append('question', text); // Ajoutez le texte de la question à FormData
 
+        // Récupérez le fichier depuis l'input de fichier et ajoutez-le à FormData
+        var fileInput = document.getElementById('assistant1a-file');
+        if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]); // Ajoute le fichier sélectionné
+        }
+
+        fetch('https://kokua060424-caea7e92447d.herokuapp.com/ask', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'question=' + encodeURIComponent(text),
+                body: formData, // Utilisez FormData ici
                 credentials: 'include'
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('assistant1a-response').innerHTML = '<p>' + data.response + '</p>';
-                document.getElementById('assistant1a-question').value = ''; // Vide l'input
+                // Traitement de la réponse, comme avant
+                const cleanHTML = DOMPurify.sanitize(data.response);
+                document.getElementById('assistant1a-response').innerHTML = cleanHTML;
+
+                // Réinitialiser l'input de la question et le champ de fichier après l'envoi
+                document.getElementById('assistant1a-question').value = ''; // Vide l'input de la question
+                document.getElementById('assistant1a-file').value = ''; // Vide l'input du fichier
                 var submitButton = document.getElementById('assistant1a-submit');
-                submitButton.disabled = true; // Désactive le bouton
+                submitButton.disabled = true; // Désactive le bouton Envoyer
                 submitButton.classList.remove(
-                    'active'
-                ); // S'assure que la classe 'active' est retirée pour revenir à la couleur bleue
+                    'active'); // Retire la classe active, si vous l'utilisez pour le style
                 if (mode === 'voice') {
-                    speak(data.response);
+                    speak(data.response); // Lance la synthèse vocale si le mode voix est actif
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -143,6 +164,38 @@ document.addEventListener('DOMContentLoaded', function() {
         utterThis.onend = function() {
             document.getElementById('assistant1a-stop').style.display = 'none';
         };
+    }
+});
+
+// Gestion de l'envoi de fichier séparée
+document.getElementById('assistant1a-file-submit').addEventListener('click', function() {
+    var fileInput = document.getElementById('assistant1a-file');
+    if (fileInput.files.length > 0) {
+        var formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        document.getElementById('assistant1a-file-upload-status').style.display =
+            'block'; // Afficher l'indicateur de chargement
+        fetch('URL_DE_VOTRE_SERVEUR', { // Remplacez par l'URL de votre serveur
+                method: 'POST',
+                body: formData,
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Gérer le succès de l'upload ici
+                document.getElementById('assistant1a-file-upload-status').style.display =
+                    'none'; // Masquer l'indicateur de chargement
+                document.getElementById('assistant1a-file').value = ''; // Réinitialiser le champ de fichier
+                document.getElementById('assistant1a-file-submit').style.backgroundColor =
+                    'green'; // Changer la couleur du bouton
+                document.getElementById('assistant1a-file-submit').innerText =
+                    'Fichier envoyé'; // Modifier le texte du bouton
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('assistant1a-file-upload-status').style.display =
+                    'none'; // Masquer en cas d'erreur
+            });
     }
 });
 </script>
