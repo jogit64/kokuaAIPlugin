@@ -110,3 +110,17 @@
   width: 24px; /* Ajustez la largeur selon vos besoins */
   height: auto; /* Gardez le ratio de l'image */
 }
+#assistant1a-file-upload-status {
+  font-family: Arial, sans-serif; /* Police de caractères */
+  color: white; /* Couleur du texte */
+}
+
+button.active {
+  background-color: red; /* Couleur de fond pour les boutons actifs */
+  color: white; /* Couleur de texte pour les boutons actifs */
+}
+
+.active {
+  background-color: red; /* ou toute autre couleur que vous souhaitez */
+  color: white;
+}
