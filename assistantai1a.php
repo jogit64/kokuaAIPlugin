@@ -69,11 +69,11 @@ function assistant1a_shortcode()
         <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
         <button type="button" id="assistant1a-file-submit" class="not-active">Envoyer le fichier</button>
     </div>
+    <!-- Ajout de l'indicateur de chargement -->
+    <div id="assistant1a-file-upload-status" style="display:none;">Chargement en cours...</div>
 </form>
-<div id="assistant1a-response"></div> <!-- Réponse affichée ici -->
-
-
-<div id="assistant1a-response"></div> <!-- Réponse affichée ici -->
+<!-- Réponse affichée ici (assurez-vous d'avoir une seule ligne de réponse) -->
+<div id="assistant1a-response"></div>
 
 
 <script>
@@ -130,6 +130,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var fileInput = document.getElementById('assistant1a-file');
         if (fileInput.files.length > 0) {
             formData.append('file', fileInput.files[0]); // Ajoute le fichier sélectionné
+            console.log("Envoi de la demande avec FormData:", formData);
+
         }
 
         fetch('https://kokua060424-caea7e92447d.herokuapp.com/ask', {
@@ -137,11 +139,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData, // Utilisez FormData ici
                 credentials: 'include'
             })
-            .then(response => response.json())
+            // .then(response => response.json())
+
+            .then(response => {
+                console.log("Réponse brute reçue de fetch:", response);
+                // return response.json(); // Continue à parser la réponse en JSON
+                return response; // Temporairement, ne pas convertir en JSON
+            })
+
             .then(data => {
                 // Traitement de la réponse, comme avant
-                const cleanHTML = DOMPurify.sanitize(data.response);
-                document.getElementById('assistant1a-response').innerHTML = cleanHTML;
+                console.log("Réponse reçue:", data.response);
+                console.log("Réponse convertie en JSON:", data);
+                // const cleanHTML = DOMPurify.sanitize(data.response);
+                // document.getElementById('assistant1a-response').innerHTML = cleanHTML;
 
                 // Réinitialiser l'input de la question et le champ de fichier après l'envoi
                 document.getElementById('assistant1a-question').value = ''; // Vide l'input de la question
@@ -167,6 +178,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+document.getElementById('assistant1a-file').addEventListener('change', function() {
+    var submitFileButton = document.getElementById('assistant1a-file-submit');
+    submitFileButton.classList.remove('not-active'); // Suppose que 'not-active' désactive le bouton
+});
+
 // Gestion de l'envoi de fichier séparée
 document.getElementById('assistant1a-file-submit').addEventListener('click', function() {
     var fileInput = document.getElementById('assistant1a-file');
@@ -175,11 +191,12 @@ document.getElementById('assistant1a-file-submit').addEventListener('click', fun
         formData.append('file', fileInput.files[0]);
         document.getElementById('assistant1a-file-upload-status').style.display =
             'block'; // Afficher l'indicateur de chargement
-        fetch('URL_DE_VOTRE_SERVEUR', { // Remplacez par l'URL de votre serveur
+        fetch('https://kokua060424-caea7e92447d.herokuapp.com/ask', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
             })
+
             .then(response => response.json())
             .then(data => {
                 // Gérer le succès de l'upload ici
