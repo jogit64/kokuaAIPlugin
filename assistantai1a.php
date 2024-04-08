@@ -69,33 +69,12 @@ document.addEventListener('DOMContentLoaded', function() {
     var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = "fr-FR";
     recognition.continuous = false;
-
-    // Pour distinguer si la dernière action était la reconnaissance vocale
-    var lastActionWasVoice = false;
-
-    var submitButton = document.getElementById('assistant1a-submit');
-    var fileSubmitButton = document.getElementById('assistant1a-file-submit');
-    var fileInput = document.getElementById('assistant1a-file');
-    var questionInput = document.getElementById('assistant1a-question');
-    var loadingIndicator = document.getElementById('assistant1a-file-upload-status');
-    var responseContainer = document.getElementById('assistant1a-response');
-
-    function updateButtonStyles() {
-        var hasFile = fileInput.files.length > 0;
-        var hasText = questionInput.value.trim().length > 0;
-
-        submitButton.disabled = !hasText;
-        fileSubmitButton.disabled = !hasFile;
-
-        submitButton.classList.toggle('active', hasText);
-        fileSubmitButton.classList.toggle('active', hasFile);
-    }
+    var mode = 'text';
 
     recognition.onresult = function(event) {
-        lastActionWasVoice = true;
         var text = event.results[0][0].transcript;
-        questionInput.value = text;
-        updateButtonStyles();
+        document.getElementById('assistant1a-question').value = text;
+        mode = 'voice';
         sendRequest();
     };
 
@@ -105,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('assistant1a-record').addEventListener('click', function() {
         this.classList.add('recording');
+        mode = 'voice';
         recognition.start();
     });
 
@@ -113,17 +93,36 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.display = 'none';
     });
 
-    questionInput.addEventListener('input', updateButtonStyles);
-    fileInput.addEventListener('change', updateButtonStyles);
+    document.getElementById('assistant1a-question').addEventListener('input', function() {
+        var submitButton = document.getElementById('assistant1a-submit');
+        submitButton.disabled = this.value.length === 0;
+        if (this.value.length > 0) {
+            submitButton.classList.add('active');
+        } else {
+            submitButton.classList.remove('active');
+        }
+    });
 
     function sendRequest() {
-        loadingIndicator.style.display = 'block';
         var formData = new FormData();
-        if (fileInput.files.length > 0) {
+        var fileInput = document.getElementById('assistant1a-file');
+        var questionInput = document.getElementById('assistant1a-question');
+        var question = questionInput.value;
+        var hasFile = fileInput.files.length > 0;
+        var hasQuestion = question.length > 0;
+
+        if (hasFile) {
             formData.append('file', fileInput.files[0]);
         }
-        if (questionInput.value.trim().length > 0) {
-            formData.append('question', questionInput.value.trim());
+
+        if (hasQuestion && !
+            hasFile) { // Modification ici pour n'inclure la question que s'il n'y a pas de fichier
+            formData.append('question', question);
+        }
+
+        if (!hasFile && !hasQuestion) {
+            // Afficher un message d'erreur ou d'instruction ici si nécessaire
+            return;
         }
 
         fetch('https://kokua060424-caea7e92447d.herokuapp.com/ask', {
@@ -133,30 +132,19 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                responseContainer.innerHTML = data.response;
-                // Active la synthèse vocale uniquement si la dernière action était la reconnaissance vocale
-                if (lastActionWasVoice) {
+                document.getElementById('assistant1a-response').innerHTML = data.response;
+                if (mode === 'voice') {
                     speak(data.response);
-                    lastActionWasVoice = false; // Réinitialise après avoir parlé
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                responseContainer.innerHTML = "Erreur lors de la requête.";
-            })
-            .finally(() => {
-                loadingIndicator.style.display = 'none';
-                questionInput.value = '';
-                fileInput.value = '';
-                updateButtonStyles();
-            });
+            .catch(error => console.error('Error:', error));
+
+        questionInput.value = '';
+        fileInput.value = '';
     }
 
-    submitButton.addEventListener('click', function() {
-        lastActionWasVoice = false; // Réinitialise pour les demandes textuelles
-        sendRequest();
-    });
-    fileSubmitButton.addEventListener('click', sendRequest);
+    document.getElementById('assistant1a-submit').addEventListener('click', sendRequest);
+    document.getElementById('assistant1a-file-submit').addEventListener('click', sendRequest);
 
     function speak(text) {
         var utterThis = new SpeechSynthesisUtterance(text);
@@ -168,7 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
 <?php
     return ob_get_clean();
 }
