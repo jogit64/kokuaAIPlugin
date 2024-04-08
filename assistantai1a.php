@@ -44,130 +44,131 @@ function assistant1a_shortcode()
 {
     ob_start(); // Commence la capture de sortie
 ?>
-<form id="assistant1a-form" enctype="multipart/form-data" method="post">
-    <div style="display: flex; width: 100%; align-items: center;">
-        <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."
-            style="flex-grow: 1; margin-right: 8px;">
-        <button type="button" id="assistant1a-submit">Demander</button>
-        <button type="button" id="assistant1a-record">
-            <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
-        </button>
-        <button type="button" id="assistant1a-stop" style="display:none;">Arrêter</button>
-    </div>
+    <form id="assistant1a-form" enctype="multipart/form-data" method="post">
+        <div style="display: flex; width: 100%; align-items: center;">
+            <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..." style="flex-grow: 1; margin-right: 8px;">
+            <button type="button" id="assistant1a-submit">Demander</button>
+            <button type="button" id="assistant1a-record">
+                <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
+            </button>
+            <button type="button" id="assistant1a-stop" style="display:none;">Arrêter</button>
+        </div>
 
-    <div id="assistant1a-file-section">
-        <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
-        <button type="button" id="assistant1a-file-submit">Envoyer le fichier</button>
-    </div>
-    <div id="assistant1a-file-upload-status" style="display:none;">Chargement en cours...</div>
-</form>
-<div id="assistant1a-response"></div>
+        <div id="assistant1a-file-section">
+            <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
+            <button type="button" id="assistant1a-file-submit">Envoyer le fichier</button>
+        </div>
+        <div id="assistant1a-file-upload-status" style="display:none;">Chargement en cours...</div>
+        <button type="button" id="assistant1a-reset">Réinitialiser la Session</button>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var synth = window.speechSynthesis;
-    var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "fr-FR";
-    recognition.continuous = false;
+    </form>
+    <div id="assistant1a-response"></div>
 
-    // Pour distinguer si la dernière action était la reconnaissance vocale
-    var lastActionWasVoice = false;
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var synth = window.speechSynthesis;
+            var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "fr-FR";
+            recognition.continuous = false;
 
-    var submitButton = document.getElementById('assistant1a-submit');
-    var fileSubmitButton = document.getElementById('assistant1a-file-submit');
-    var fileInput = document.getElementById('assistant1a-file');
-    var questionInput = document.getElementById('assistant1a-question');
-    var loadingIndicator = document.getElementById('assistant1a-file-upload-status');
-    var responseContainer = document.getElementById('assistant1a-response');
+            // Pour distinguer si la dernière action était la reconnaissance vocale
+            var lastActionWasVoice = false;
 
-    function updateButtonStyles() {
-        var hasFile = fileInput.files.length > 0;
-        var hasText = questionInput.value.trim().length > 0;
+            var submitButton = document.getElementById('assistant1a-submit');
+            var fileSubmitButton = document.getElementById('assistant1a-file-submit');
+            var fileInput = document.getElementById('assistant1a-file');
+            var questionInput = document.getElementById('assistant1a-question');
+            var loadingIndicator = document.getElementById('assistant1a-file-upload-status');
+            var responseContainer = document.getElementById('assistant1a-response');
 
-        submitButton.disabled = !hasText;
-        fileSubmitButton.disabled = !hasFile;
+            function updateButtonStyles() {
+                var hasFile = fileInput.files.length > 0;
+                var hasText = questionInput.value.trim().length > 0;
 
-        submitButton.classList.toggle('active', hasText);
-        fileSubmitButton.classList.toggle('active', hasFile);
-    }
+                submitButton.disabled = !hasText;
+                fileSubmitButton.disabled = !hasFile;
 
-    recognition.onresult = function(event) {
-        lastActionWasVoice = true;
-        var text = event.results[0][0].transcript;
-        questionInput.value = text;
-        updateButtonStyles();
-        sendRequest();
-    };
+                submitButton.classList.toggle('active', hasText);
+                fileSubmitButton.classList.toggle('active', hasFile);
+            }
 
-    recognition.onend = function() {
-        document.getElementById('assistant1a-record').classList.remove('recording');
-    };
-
-    document.getElementById('assistant1a-record').addEventListener('click', function() {
-        this.classList.add('recording');
-        recognition.start();
-    });
-
-    document.getElementById('assistant1a-stop').addEventListener('click', function() {
-        synth.cancel();
-        this.style.display = 'none';
-    });
-
-    questionInput.addEventListener('input', updateButtonStyles);
-    fileInput.addEventListener('change', updateButtonStyles);
-
-    function sendRequest() {
-        loadingIndicator.style.display = 'block';
-        var formData = new FormData();
-        if (fileInput.files.length > 0) {
-            formData.append('file', fileInput.files[0]);
-        }
-        if (questionInput.value.trim().length > 0) {
-            formData.append('question', questionInput.value.trim());
-        }
-
-        fetch('https://kokua060424-caea7e92447d.herokuapp.com/ask', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                responseContainer.innerHTML = data.response;
-                // Active la synthèse vocale uniquement si la dernière action était la reconnaissance vocale
-                if (lastActionWasVoice) {
-                    speak(data.response);
-                    lastActionWasVoice = false; // Réinitialise après avoir parlé
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                responseContainer.innerHTML = "Erreur lors de la requête.";
-            })
-            .finally(() => {
-                loadingIndicator.style.display = 'none';
-                questionInput.value = '';
-                fileInput.value = '';
+            recognition.onresult = function(event) {
+                lastActionWasVoice = true;
+                var text = event.results[0][0].transcript;
+                questionInput.value = text;
                 updateButtonStyles();
+                sendRequest();
+            };
+
+            recognition.onend = function() {
+                document.getElementById('assistant1a-record').classList.remove('recording');
+            };
+
+            document.getElementById('assistant1a-record').addEventListener('click', function() {
+                this.classList.add('recording');
+                recognition.start();
             });
-    }
 
-    submitButton.addEventListener('click', function() {
-        lastActionWasVoice = false; // Réinitialise pour les demandes textuelles
-        sendRequest();
-    });
-    fileSubmitButton.addEventListener('click', sendRequest);
+            document.getElementById('assistant1a-stop').addEventListener('click', function() {
+                synth.cancel();
+                this.style.display = 'none';
+            });
 
-    function speak(text) {
-        var utterThis = new SpeechSynthesisUtterance(text);
-        synth.speak(utterThis);
-        document.getElementById('assistant1a-stop').style.display = 'block';
-        utterThis.onend = function() {
-            document.getElementById('assistant1a-stop').style.display = 'none';
-        };
-    }
-});
-</script>
+            questionInput.addEventListener('input', updateButtonStyles);
+            fileInput.addEventListener('change', updateButtonStyles);
+
+            function sendRequest() {
+                loadingIndicator.style.display = 'block';
+                var formData = new FormData();
+                if (fileInput.files.length > 0) {
+                    formData.append('file', fileInput.files[0]);
+                }
+                if (questionInput.value.trim().length > 0) {
+                    formData.append('question', questionInput.value.trim());
+                }
+
+                fetch('https://kokua060424-caea7e92447d.herokuapp.com/ask', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        responseContainer.innerHTML = data.response;
+                        // Active la synthèse vocale uniquement si la dernière action était la reconnaissance vocale
+                        if (lastActionWasVoice) {
+                            speak(data.response);
+                            lastActionWasVoice = false; // Réinitialise après avoir parlé
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        responseContainer.innerHTML = "Erreur lors de la requête.";
+                    })
+                    .finally(() => {
+                        loadingIndicator.style.display = 'none';
+                        questionInput.value = '';
+                        fileInput.value = '';
+                        updateButtonStyles();
+                    });
+            }
+
+            submitButton.addEventListener('click', function() {
+                lastActionWasVoice = false; // Réinitialise pour les demandes textuelles
+                sendRequest();
+            });
+            fileSubmitButton.addEventListener('click', sendRequest);
+
+            function speak(text) {
+                var utterThis = new SpeechSynthesisUtterance(text);
+                synth.speak(utterThis);
+                document.getElementById('assistant1a-stop').style.display = 'block';
+                utterThis.onend = function() {
+                    document.getElementById('assistant1a-stop').style.display = 'none';
+                };
+            }
+        });
+    </script>
 
 <?php
     return ob_get_clean();
