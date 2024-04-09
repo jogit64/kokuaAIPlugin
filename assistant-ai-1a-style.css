@@ -1,40 +1,33 @@
 #assistant1a-form {
   display: flex;
-  /* align-items: center; */
-
   flex-direction: column;
   align-items: flex-start;
 }
 
-#assistant1a-question {
-  flex-grow: 1;
-  margin-right: 8px; /* Ajoutez une marge entre l'input et les boutons */
-}
-
 #assistant1a-submit,
 #assistant1a-record,
-#assistant1a-stop {
+#assistant1a-stop,
+#assistant1a-file-submit {
   margin-left: 4px;
 }
 
 #assistant1a-question {
-  font-size: 16px; /* Taille de la police */
-  color: black; /* Couleur du texte */
-  padding: 10px; /* Espacement intérieur */
+  flex-grow: 1;
+  margin-right: 8px;
+  font-size: 16px;
+  color: black;
+  padding: 10px;
 }
 
 #assistant1a-file-section {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  /* align-items: flex-end; */
   margin-top: 20px;
   width: 100%;
 }
-/* ! input Choisir fichierr */
 
 #assistant1a-file {
-  /* flex-grow: 1; */
   justify-content: flex-start;
   margin-right: 8px;
   padding: 10px 20px;
@@ -42,92 +35,20 @@
   background-color: #485563;
 }
 
-/* ! bouton Demander */
-
-#assistant1a-submit.active {
-  background-color: red;
+#assistant1a-response,
+#assistant1a-file-upload-status {
+  font-family: Arial, sans-serif;
   color: white;
-}
-
-#assistant1a-submit:not(.active) {
-  background-color: blue;
-  color: white;
-}
-
-#assistant1a-submit {
-  background-color: blue;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-}
-
-/* ! bouton envoyer fichier */
-
-#assistant1a-file-submit {
-  background-color: blue; /* Couleur de fond identique à celle du bouton Demander */
-  color: white; /* Couleur du texte en blanc */
-  padding: 10px 20px; /* Padding identique au bouton Demander */
-  border: none; /* Aucune bordure */
-  cursor: pointer; /* Style de curseur identique */
-  margin-left: 4px; /* Assurez-vous d'avoir un peu d'espace entre les éléments */
-}
-
-/* Vous pouvez ajouter une classe spécifique pour le bouton non actif si nécessaire */
-#assistant1a-file-submit:not(.active) {
-  background-color: blue; /* Couleur de fond pour l'état non actif */
-  /* Ajouter d'autres styles pour l'état non actif si nécessaire */
-}
-
-#assistant1a-record {
-  transition: background-color 0.5s ease; /* Transition douce pour le changement de couleur */
-  background-color: blue; /* Couleur de fond */
-  color: white; /* Couleur du texte */
-  padding: 10px 20px; /* Espacement intérieur */
-  border: none; /* Pas de bordure */
-  cursor: pointer; /* Curseur pointeur */
-}
-
-#assistant1a-record.recording {
-  background-color: #ff0000; /* Rouge */
-  color: #ffffff; /* Texte blanc */
-}
-#assistant1a-stop {
-  display: none; /* Initialement masqué */
-  background-color: red; /* Rouge pour l'arrêt */
-  color: white; /* Texte blanc */
-  padding: 10px 20px; /* Espacement intérieur */
-  border: none; /* Pas de bordure */
-  cursor: pointer; /* Curseur pointeur */
-}
-
-#assistant1a-response {
-  font-family: Arial, sans-serif; /* Police de caractères */
-  color: white; /* Couleur du texte */
 }
 
 #assistant1a-record img {
-  width: 24px; /* Ajustez la largeur selon vos besoins */
-  height: auto; /* Gardez le ratio de l'image */
-}
-#assistant1a-file-upload-status {
-  font-family: Arial, sans-serif; /* Police de caractères */
-  color: white; /* Couleur du texte */
-}
-
-button.active {
-  background-color: red; /* Couleur de fond pour les boutons actifs */
-  color: white; /* Couleur de texte pour les boutons actifs */
-}
-
-.active {
-  background-color: red; /* ou toute autre couleur que vous souhaitez */
-  color: white;
+  width: 24px;
+  height: auto;
 }
 
 .loader {
-  border: 6px solid #f3f3f3; /* Light grey */
-  border-top: 6px solid #3498db; /* Blue */
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #3498db;
   border-radius: 50%;
   width: 30px;
   height: 30px;
@@ -142,8 +63,34 @@ button.active {
     transform: rotate(360deg);
   }
 }
-button:disabled,
-input:disabled {
+
+/* Style de base pour tous les boutons, états désactivés et actifs spécifiques */
+#assistant1a-form button.custom-button {
+  background-color: blue;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, opacity 0.3s;
+}
+
+#assistant1a-form button.custom-button:disabled,
+#assistant1a-form input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+#assistant1a-form button.custom-button.active {
+  opacity: 1;
+}
+
+#assistant1a-form #assistant1a-record.recording {
+  background-color: red;
+  opacity: 1;
+}
+#assistant1a-response {
+  color: black;
+  border: 1px;
+  border-color: black;
+  border-radius: 5px;
 }

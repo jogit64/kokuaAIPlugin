@@ -48,29 +48,38 @@ function assistant1a_shortcode()
     <div style="display: flex; width: 100%; align-items: center;">
         <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."
             style="flex-grow: 1; margin-right: 8px;">
-        <button type="button" id="assistant1a-submit">Demander</button>
-        <button type="button" id="assistant1a-record">
+        <button type="button" id="assistant1a-submit" class="custom-button">Demander</button>
+        <button type="button" id="assistant1a-record" class="custom-button">
             <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
         </button>
-        <button type="button" id="assistant1a-stop" style="display:none;">Arrêter</button>
+        <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
     </div>
 
     <div id="assistant1a-file-section">
         <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
-        <button type="button" id="assistant1a-file-submit">Envoyer le fichier</button>
+        <button type="button" id="assistant1a-file-submit" class="custom-button">Envoyer le fichier</button>
     </div>
     <div id="assistant1a-file-upload-status" style="display:none;">
         <div class="loader"></div> Chargement en cours...
     </div>
 
-    <button type="button" id="assistant1a-reset">Réinitialiser la Session</button>
-
-
+    <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
 </form>
 <div id="assistant1a-response"></div>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+    var allButtons = document.querySelectorAll('button');
+    var microButton = document.getElementById('assistant1a-record');
+    var submitButton = document.getElementById('assistant1a-submit');
+    var fileSubmitButton = document.getElementById('assistant1a-file-submit');
+    var fileInput = document.getElementById('assistant1a-file');
+    var questionInput = document.getElementById('assistant1a-question');
+    var resetButton = document.getElementById('assistant1a-reset');
+
+    var indicator = document.getElementById('assistant1a-file-upload-status');
     var synth = window.speechSynthesis;
     var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
     var isRequestPending = false;
@@ -86,6 +95,47 @@ document.addEventListener('DOMContentLoaded', function() {
     var questionInput = document.getElementById('assistant1a-question');
     var loadingIndicator = document.getElementById('assistant1a-file-upload-status');
     var responseContainer = document.getElementById('assistant1a-response');
+
+    // Initialisation : tous les boutons sauf le micro sont désactivés.
+    allButtons.forEach(button => {
+        if (button !== microButton) button.disabled = true;
+    });
+
+    function handleInteraction() {
+        // Dès qu'une interaction est détectée, le bouton micro est désactivé.
+        microButton.disabled = true;
+        // Active les autres boutons si leurs conditions sont remplies (a déjà été géré par `updateButtonStyles`).
+    }
+
+    questionInput.addEventListener('input', handleInteraction);
+    fileInput.addEventListener('change', handleInteraction);
+
+    // Réinitialise l'état initial lors du clic sur réinitialiser.
+    resetButton.addEventListener('click', function() {
+        // Réactivation du bouton micro.
+        microButton.disabled = false;
+        // Désactivation des autres boutons jusqu'à une nouvelle interaction.
+        allButtons.forEach(button => {
+            if (button !== microButton) button.disabled = true;
+        });
+    });
+
+    function setLoadingState(isLoading) {
+        allButtons.forEach(function(button) {
+            // Ne désactive pas le bouton micro sauf si explicitement requis
+            if (!button.id.includes('record') || isLoading) {
+                button.disabled = isLoading;
+            }
+        });
+
+        indicator.style.display = isLoading ? 'block' : 'none';
+    }
+
+    // Utilise cette fonction pour activer/désactiver l'état de chargement
+    function toggleLoadingState() {
+        var currentState = indicator.style.display === 'block';
+        setLoadingState(!currentState);
+    }
 
     function updateButtonStyles() {
         var hasFile = fileInput.files.length > 0;
@@ -135,6 +185,8 @@ document.addEventListener('DOMContentLoaded', function() {
     fileInput.addEventListener('change', updateButtonStyles);
 
     function sendRequest() {
+        setLoadingState(true);
+
         if (isRequestPending) return; // Empêche l'envoi si une requête est déjà en cours
         isRequestPending = true; // Marque une requête en cours
         loadingIndicator.style.display = 'block';
@@ -177,6 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 questionInput.value = '';
                 fileInput.value = '';
                 updateButtonStyles();
+                setLoadingState(false);
             });
     }
 
