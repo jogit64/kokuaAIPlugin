@@ -1,0 +1,251 @@
+document.addEventListener("DOMContentLoaded", function () {
+  var allButtons = document.querySelectorAll("button");
+  var microButton = document.getElementById("assistant1a-record");
+  var submitButton = document.getElementById("assistant1a-submit");
+  var fileSubmitButton = document.getElementById("assistant1a-file-submit");
+  var fileInput = document.getElementById("assistant1a-file");
+  var questionInput = document.getElementById("assistant1a-question");
+  var resetButton = document.getElementById("assistant1a-reset");
+
+  var indicator = document.getElementById("assistant1a-file-upload-status");
+  var synth = window.speechSynthesis;
+  var recognition = new (window.SpeechRecognition ||
+    window.webkitSpeechRecognition)();
+  var isRequestPending = false;
+  recognition.lang = "fr-FR";
+  recognition.continuous = false;
+
+  // Pour distinguer si la dernière action était la reconnaissance vocale
+  var lastActionWasVoice = false;
+
+  var submitButton = document.getElementById("assistant1a-submit");
+  var fileSubmitButton = document.getElementById("assistant1a-file-submit");
+  var fileInput = document.getElementById("assistant1a-file");
+  var questionInput = document.getElementById("assistant1a-question");
+  var loadingIndicator = document.getElementById(
+    "assistant1a-file-upload-status"
+  );
+  var responseContainer = document.getElementById("assistant1a-response");
+
+  var cancelButton = document.createElement("button");
+  cancelButton.textContent = "Annuler le choix du fichier";
+  cancelButton.id = "assistant1a-cancel-file";
+  cancelButton.className = "custom-button";
+  cancelButton.style.display = "none"; // Caché par défaut
+  document.getElementById("assistant1a-file-section").appendChild(cancelButton);
+
+  cancelButton.addEventListener("click", function () {
+    fileInput.value = ""; // Réinitialise le choix du fichier
+    this.style.display = "none"; // Cache le bouton d'annulation
+    updateButtonStyles(); // Met à jour l'état des boutons
+    // Réinitialiser l'état des boutons selon vos règles d'activation/désactivation
+    allButtons.forEach(function (button) {
+      button.disabled = true; // Désactiver tous les boutons
+    });
+    microButton.disabled = false; // Activer le bouton du micro
+  });
+
+  fileInput.addEventListener("change", function () {
+    if (this.files.length > 0) {
+      // Affiche le bouton d'annulation lorsque l'utilisateur a choisi un fichier
+      cancelButton.style.display = "block";
+      // Désactive tous les autres boutons sauf "Envoyer le fichier"
+      allButtons.forEach(function (button) {
+        if (button !== fileSubmitButton && button !== cancelButton) {
+          button.disabled = true;
+        }
+      });
+    }
+  });
+
+  // Initialisation : tous les boutons sauf le micro sont désactivés.
+  allButtons.forEach((button) => {
+    if (button !== microButton) button.disabled = true;
+  });
+
+  function handleInteraction() {
+    // Dès qu'une interaction est détectée, le bouton micro est désactivé.
+    microButton.disabled = true;
+    // Active les autres boutons si leurs conditions sont remplies (a déjà été géré par `updateButtonStyles`).
+  }
+
+  questionInput.addEventListener("input", handleInteraction);
+  fileInput.addEventListener("change", handleInteraction);
+
+  // Réinitialise l'état initial lors du clic sur réinitialiser.
+  resetButton.addEventListener("click", function () {
+    // Réactivation du bouton micro.
+    microButton.disabled = false;
+    // Désactivation des autres boutons jusqu'à une nouvelle interaction.
+    allButtons.forEach((button) => {
+      if (button !== microButton) button.disabled = true;
+    });
+  });
+
+  function setLoadingState(isLoading) {
+    allButtons.forEach(function (button) {
+      // Ne désactive pas le bouton micro sauf si explicitement requis
+      if (!button.id.includes("record") || isLoading) {
+        button.disabled = isLoading;
+      }
+    });
+
+    indicator.style.display = isLoading ? "block" : "none";
+  }
+
+  // Utilise cette fonction pour activer/désactiver l'état de chargement
+  function toggleLoadingState() {
+    var currentState = indicator.style.display === "block";
+    setLoadingState(!currentState);
+  }
+
+  function updateButtonStyles() {
+    var hasFile = fileInput.files.length > 0;
+    var hasText = questionInput.value.trim().length > 0;
+    var isSpeaking = synth.speaking;
+
+    // Désactive ou active les boutons selon l'état actuel
+    submitButton.disabled =
+      !hasText || isRequestPending || hasFile || isSpeaking;
+    fileSubmitButton.disabled = !hasFile || isRequestPending || isSpeaking;
+    resetButton.disabled =
+      isRequestPending || (!hasFile && !hasText && !isSpeaking);
+    microButton.disabled = hasFile || isRequestPending || isSpeaking;
+
+    // Gestion spécifique pour le bouton "Arrêter"
+    var stopButton = document.getElementById("assistant1a-stop");
+    stopButton.style.display = isSpeaking ? "block" : "none";
+    stopButton.disabled = !isSpeaking;
+
+    // Activation du bouton de réinitialisation si l'utilisateur a déjà interagi
+    if (hasFile || hasText || isSpeaking) {
+      resetButton.disabled = false;
+    }
+  }
+
+  recognition.onresult = function (event) {
+    lastActionWasVoice = true;
+    var text = event.results[0][0].transcript;
+    questionInput.value = text;
+    updateButtonStyles();
+    sendRequest();
+  };
+
+  recognition.onend = function () {
+    document.getElementById("assistant1a-record").classList.remove("recording");
+    updateButtonStyles();
+  };
+
+  document
+    .getElementById("assistant1a-record")
+    .addEventListener("click", function () {
+      this.classList.add("recording");
+      recognition.start();
+    });
+
+  document
+    .getElementById("assistant1a-stop")
+    .addEventListener("click", function () {
+      synth.cancel();
+      this.style.display = "none";
+      updateButtonStyles();
+    });
+
+  document
+    .getElementById("assistant1a-reset")
+    .addEventListener("click", function () {
+      if (isRequestPending) return; // Empêche la réinitialisation pendant une requête active
+      // Appelez une fonction pour réinitialiser la session côté serveur
+      resetSession();
+      // Réinitialisez l'interface utilisateur comme nécessaire
+      questionInput.value = "";
+      fileInput.value = "";
+      responseContainer.innerHTML = "";
+      updateButtonStyles();
+    });
+
+  questionInput.addEventListener("input", updateButtonStyles);
+  fileInput.addEventListener("change", updateButtonStyles);
+
+  function sendRequest() {
+    setLoadingState(true);
+
+    if (isRequestPending) return; // Empêche l'envoi si une requête est déjà en cours
+    isRequestPending = true; // Marque une requête en cours
+    loadingIndicator.style.display = "block";
+    submitButton.disabled = true; // Désactive le bouton de soumission
+    fileSubmitButton.disabled = true; // Optionnel: désactivez également d'autres boutons si nécessaire
+
+    loadingIndicator.style.display = "block";
+    var formData = new FormData();
+    if (fileInput.files.length > 0) {
+      formData.append("file", fileInput.files[0]);
+    }
+    if (questionInput.value.trim().length > 0) {
+      formData.append("question", questionInput.value.trim());
+    }
+
+    fetch("https://kokua060424-caea7e92447d.herokuapp.com/ask", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        responseContainer.innerHTML = data.response;
+        // Active la synthèse vocale uniquement si la dernière action était la reconnaissance vocale
+        if (lastActionWasVoice) {
+          speak(data.response);
+          lastActionWasVoice = false; // Réinitialise après avoir parlé
+        }
+        updateButtonStyles();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        responseContainer.innerHTML = "Erreur lors de la requête.";
+      })
+      .finally(() => {
+        loadingIndicator.style.display = "none";
+        // submitButton.disabled = false; // Réactive le bouton de soumission
+        // fileSubmitButton.disabled = false; // Réactive les autres boutons
+        isRequestPending = false; // Réinitialise l'indicateur de requête
+
+        questionInput.value = "";
+        fileInput.value = "";
+        updateButtonStyles();
+        setLoadingState(false);
+      });
+  }
+
+  submitButton.addEventListener("click", function () {
+    lastActionWasVoice = false; // Réinitialise pour les demandes textuelles
+    sendRequest();
+  });
+  fileSubmitButton.addEventListener("click", sendRequest);
+
+  function speak(text) {
+    var utterThis = new SpeechSynthesisUtterance(text);
+    synth.speak(utterThis);
+    document.getElementById("assistant1a-stop").style.display = "block";
+    utterThis.onend = function () {
+      document.getElementById("assistant1a-stop").style.display = "none";
+    };
+  }
+
+  function resetSession() {
+    // Implémentez la logique pour réinitialiser la session côté serveur ici
+    // Cela peut être un appel fetch à un endpoint qui gère la réinitialisation
+    fetch("https://kokua060424-caea7e92447d.herokuapp.com/reset-session", {
+      method: "POST",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log("Session réinitialisée avec succès.");
+        } else {
+          console.error("Erreur lors de la réinitialisation de la session.");
+        }
+      })
+      .catch((error) => console.error("Erreur:", error));
+  }
+});
