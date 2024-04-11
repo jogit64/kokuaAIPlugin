@@ -116,8 +116,12 @@ document.addEventListener("DOMContentLoaded", function () {
   stopButton.addEventListener("click", function () {
     synth.cancel(); // Arrête la synthèse vocale
     questionInput.value = ""; // Vide l'input de la question
-    setButtonStates(); // Met à jour l'état des boutons selon la logique existante
-    this.style.display = "none"; // Cache le stopButton après avoir arrêté la synthèse vocale
+
+    // Indique qu'une action a été effectuée pour activer le resetButton
+    lastAction = "voice"; // Ou utilisez une valeur appropriée qui indique une session active
+
+    setButtonStates(); // Met à jour l'état des boutons
+    this.style.display = "none"; // Cache le stopButton
   });
 
   submitButton.addEventListener("click", () => sendRequest(false));
