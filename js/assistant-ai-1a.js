@@ -114,8 +114,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   stopButton.addEventListener("click", function () {
-    synth.cancel();
-    this.style.display = "none"; // Cache le stopButton après l'arrêt de la synthèse vocale
+    synth.cancel(); // Arrête la synthèse vocale
+    questionInput.value = ""; // Vide l'input de la question
+    setButtonStates(); // Met à jour l'état des boutons selon la logique existante
+    this.style.display = "none"; // Cache le stopButton après avoir arrêté la synthèse vocale
   });
 
   submitButton.addEventListener("click", () => sendRequest(false));
