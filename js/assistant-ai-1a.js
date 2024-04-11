@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   var allButtons = document.querySelectorAll("button");
   var microButton = document.getElementById("assistant1a-record");
-  stopButton = document.getElementById("assistant1a-stop");
+  var stopButton = document.getElementById("assistant1a-stop");
   var submitButton = document.getElementById("assistant1a-submit");
   var fileSubmitButton = document.getElementById("assistant1a-file-submit");
   var fileInput = document.getElementById("assistant1a-file");
@@ -115,6 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   stopButton.addEventListener("click", function () {
     synth.cancel();
+    this.style.display = "none"; // Cache le stopButton après l'arrêt de la synthèse vocale
   });
 
   submitButton.addEventListener("click", () => sendRequest(false));
@@ -123,6 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
   microButton.addEventListener("click", function () {
     this.classList.add("recording");
     recognition.start();
+    stopButton.style.display = "block"; // Ajoutez cette ligne pour afficher le stopButton
   });
 
   recognition.onresult = function (event) {
