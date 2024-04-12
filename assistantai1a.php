@@ -53,28 +53,30 @@ function assistant1a_shortcode()
     // HTML du formulaire
 ?>
 
-    <form id="assistant1a-form" enctype="multipart/form-data" method="post">
-        <div style="display: flex; width: 100%; align-items: center;">
-            <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..." style="flex-grow: 1; margin-right: 8px;">
-            <button type="button" id="assistant1a-submit" class="custom-button">Demander</button>
-            <button type="button" id="assistant1a-record" class="custom-button">
-                <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
-            </button>
-            <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
-        </div>
+<form id="assistant1a-form" enctype="multipart/form-data" method="post">
+    <div>
+        <!-- <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."> -->
+        <textarea id="assistant1a-question" name="question" placeholder="Posez votre question ici..."></textarea>
 
-        <div id="assistant1a-file-section">
-            <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
-            <button type="button" id="assistant1a-file-submit" class="custom-button">Envoyer le fichier</button>
-        </div>
-        <div id="assistant1a-file-upload-status" style="display:none;">
-            <div class="loader"></div> Chargement en cours...
-        </div>
+        <button type="button" id="assistant1a-submit" class="custom-button">Demander</button>
+        <button type="button" id="assistant1a-record" class="custom-button">
+            <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
+        </button>
+        <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
+    </div>
 
-        <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
-    </form>
+    <div id="assistant1a-file-section">
+        <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
+        <button type="button" id="assistant1a-file-submit" class="custom-button">Envoyer le fichier</button>
+    </div>
+    <div id="assistant1a-file-upload-status" style="display:none;">
+        <div class="loader"></div> Chargement en cours...
+    </div>
 
-    <div id="assistant1a-response"></div>
+    <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
+</form>
+
+<div id="assistant1a-response"></div>
 
 <?php
     return ob_get_clean();
