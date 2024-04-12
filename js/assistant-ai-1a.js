@@ -42,10 +42,20 @@ document.addEventListener("DOMContentLoaded", function () {
   function resetUI() {
     questionInput.value = "";
     fileInput.value = "";
-    responseContainer.innerHTML = "";
+    // responseContainer.innerHTML = "";
+    updateResponseContainer("");
     cancelButton.style.display = "none";
     lastAction = null;
     setButtonStates();
+  }
+  function updateResponseContainer(content) {
+    var responseContainer = document.getElementById("assistant1a-response");
+    if (content.trim() === "") {
+      responseContainer.style.display = "none";
+    } else {
+      responseContainer.innerHTML = content;
+      responseContainer.style.display = "block";
+    }
   }
 
   function setButtonStates() {
@@ -96,7 +106,8 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((response) => response.json())
       .then((data) => {
-        responseContainer.innerHTML = data.response;
+        // responseContainer.innerHTML = data.response;
+        updateResponseContainer(data.response);
         if (isVoice) {
           speak(data.response);
         }
@@ -107,7 +118,8 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((error) => {
         console.error("Error:", error);
-        responseContainer.innerHTML = "Erreur lors de la requête.";
+        // responseContainer.innerHTML = "Erreur lors de la requête.";
+        updateResponseContainer("Erreur lors de la requête.");
       })
       .finally(() => {
         if (!isVoice) {

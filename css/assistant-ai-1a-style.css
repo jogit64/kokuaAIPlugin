@@ -145,7 +145,26 @@
   border: 1px solid #4e5d6c;
   border-radius: 5px;
 }
-#assistant1a-file-upload-status {
+/* #assistant1a-file-upload-status {
+  width: 100%; 
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  align-self: center;
+} */
+
+.charger {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+}
+.loader {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   align-self: center;
 }
 

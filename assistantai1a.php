@@ -61,7 +61,7 @@ function assistant1a_shortcode()
             <button type="button" id="assistant1a-record" class="custom-button">
                 <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
             </button>
-
+            <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
             <textarea id="assistant1a-question" name="question" placeholder="Posez votre question ici..."></textarea>
 
             <!-- <button type="button" id="assistant1a-submit" class="custom-button">Demander</button> -->
@@ -70,7 +70,6 @@ function assistant1a_shortcode()
             </button>
 
 
-            <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
         </div>
         <div class="second-part">
 
@@ -87,9 +86,13 @@ function assistant1a_shortcode()
                 <legend>Session utilisateur</legend>
                 <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
             </fieldset>
+
         </div>
-        <div id="assistant1a-file-upload-status" style="display:none;">
-            <div class="loader"></div> Chargement en cours...
+        <div class="charger">
+
+            <div id="assistant1a-file-upload-status" style="display:none;">
+                <div class="loader"></div> Chargement en cours...
+            </div>
         </div>
         <div id="assistant1a-response">
 
