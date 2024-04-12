@@ -1,7 +1,38 @@
-#assistant1a-form {
+.widget {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  /* background-color: #2b3e50; */
+  background-color: yellow;
+  /* width: 80%; */
+}
+#assistant1a-form {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  align-items: center;
+
+  background-color: #2b3e50;
+}
+.zone-scrib {
+  display: flex;
+  /* flex-grow: 1; */
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: #2b3e4f;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+.second-part {
+  display: flex;
+  /* flex-grow: 1; */
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  padding-right: 10px;
+  padding-left: 10px;
 }
 
 #assistant1a-submit,
@@ -12,20 +43,25 @@
 }
 
 #assistant1a-question {
-  flex-grow: 1;
+  /* flex-grow: 1; */
   margin-right: 8px;
+  margin-left: 8px;
   font-size: 16px;
-  color: black;
+  color: rgb(255, 255, 255);
+  border: 1px solid #4e5d6c;
+
   padding: 10px;
   min-height: 50px;
+  background-color: #2b3e50;
+  width: 550px;
 }
 
 #assistant1a-file-section {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  margin-top: 20px;
-  width: 100%;
+  /* margin-top: 20px; */
+  /* width: 100%; */
 }
 
 #assistant1a-file {
@@ -34,6 +70,12 @@
   padding: 10px 20px;
   color: #ffffff;
   background-color: #485563;
+  font-size: 12px;
+}
+#assistant1a-file-submit,
+#assistant1a-cancel-file {
+  font-size: 12px;
+  margin-right: 8px;
 }
 
 #assistant1a-response,
@@ -45,6 +87,14 @@
 #assistant1a-record img {
   width: 24px;
   height: auto;
+}
+
+#assistant1a-submit img {
+  width: 24px;
+  height: auto;
+}
+#assistant1a-reset {
+  font-size: 12px;
 }
 
 .loader {
@@ -67,7 +117,7 @@
 
 /* Style de base pour tous les boutons, états désactivés et actifs spécifiques */
 #assistant1a-form button.custom-button {
-  background-color: blue;
+  background-color: #4e5d6c;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -90,8 +140,23 @@
   opacity: 1;
 }
 #assistant1a-response {
-  color: black;
-  border: 1px;
-  border-color: black;
+  margin-top: 30px;
+  padding: 10px;
+  border: 1px solid #4e5d6c;
   border-radius: 5px;
+}
+#assistant1a-file-upload-status {
+  align-self: center;
+}
+
+fieldset {
+  margin-top: 30px;
+  /* margin-bottom: 30px; */
+  border: 1px solid #4e5d6c;
+}
+fieldset legend {
+  color: #fff; /* Couleur du texte */
+  font-size: 14px; /* Taille du texte */
+
+  padding: 5px 5px; /* Espacement interne pour mieux encadrer le texte */
 }

@@ -52,31 +52,53 @@ function assistant1a_shortcode()
     ob_start(); // Commence la capture de sortie
     // HTML du formulaire
 ?>
+<div class="widget">
 
-<form id="assistant1a-form" enctype="multipart/form-data" method="post">
-    <div>
-        <!-- <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."> -->
-        <textarea id="assistant1a-question" name="question" placeholder="Posez votre question ici..."></textarea>
+    <form id="assistant1a-form" enctype="multipart/form-data" method="post">
 
-        <button type="button" id="assistant1a-submit" class="custom-button">Demander</button>
-        <button type="button" id="assistant1a-record" class="custom-button">
-            <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
-        </button>
-        <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
-    </div>
+        <div class="zone-scrib">
+            <!-- <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."> -->
+            <button type="button" id="assistant1a-record" class="custom-button">
+                <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
+            </button>
 
-    <div id="assistant1a-file-section">
-        <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
-        <button type="button" id="assistant1a-file-submit" class="custom-button">Envoyer le fichier</button>
-    </div>
-    <div id="assistant1a-file-upload-status" style="display:none;">
-        <div class="loader"></div> Chargement en cours...
-    </div>
+            <textarea id="assistant1a-question" name="question" placeholder="Posez votre question ici..."></textarea>
 
-    <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
-</form>
+            <!-- <button type="button" id="assistant1a-submit" class="custom-button">Demander</button> -->
+            <button type="button" id="assistant1a-submit" class="custom-button">
+                <img src="<?php echo plugins_url('assets/sortie.png', __FILE__); ?>" alt="Demandera">
+            </button>
 
-<div id="assistant1a-response"></div>
+
+            <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
+        </div>
+        <div class="second-part">
+
+            <fieldset>
+                <legend>Gestion du fichier</legend>
+                <div id="assistant1a-file-section">
+                    <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
+                    <button type="button" id="assistant1a-file-submit" class="custom-button">Envoyer le fichier</button>
+                </div>
+            </fieldset>
+
+
+            <fieldset>
+                <legend>Session utilisateur</legend>
+                <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
+            </fieldset>
+        </div>
+        <div id="assistant1a-file-upload-status" style="display:none;">
+            <div class="loader"></div> Chargement en cours...
+        </div>
+        <div id="assistant1a-response">
+
+        </div>
+    </form>
+
+
+</div>
+
 
 <?php
     return ob_get_clean();
