@@ -89,6 +89,12 @@
   height: auto;
 }
 
+#assistant1a-stop {
+  height: 50px;
+  margin-right: 4px;
+  font-size: 12px;
+}
+
 #assistant1a-submit img {
   width: 24px;
   height: auto;
