@@ -100,6 +100,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (isVoice) {
           speak(data.response);
         }
+        // Hide cancelButton after file is sent
+        if (!isVoice && fileInput.files.length > 0) {
+          cancelButton.style.display = "none";
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -125,7 +129,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   submitButton.addEventListener("click", () => sendRequest(false));
-  fileSubmitButton.addEventListener("click", () => sendRequest(false));
+
+  fileSubmitButton.addEventListener("click", () => {
+    sendRequest(false);
+    fileInput.value = ""; // Réinitialise le champ de fichier après l'envoi
+    cancelButton.style.display = "none"; // Cache immédiatement le bouton d'annulation
+  });
 
   microButton.addEventListener("click", function () {
     this.classList.add("recording");
