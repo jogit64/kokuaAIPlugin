@@ -103,7 +103,13 @@ function assistant1a_shortcode()
                     <div class="loader"></div>
                 </div>
             </div>
-            <div id="assistant1a-response"> </div>
+            <div id="assistant1a-response"></div>
+            <div id="response-actions" style="display:none;">
+                <!-- Actions cachées par défaut -->
+                <button id="copyButton">Copier l'échange</button>
+                <button id="saveButton">Sauvegarder l'échange</button>
+            </div>
+
         </form>
 
 

@@ -16,6 +16,16 @@ document.addEventListener("DOMContentLoaded", function () {
   recognition.lang = "fr-FR";
   recognition.continuous = false;
 
+  var copyButton = document.getElementById("copyButton");
+  var saveButton = document.getElementById("saveButton");
+
+  if (copyButton && saveButton) {
+    copyButton.addEventListener("click", copyChatHistory);
+    saveButton.addEventListener("click", saveChatHistory);
+  } else {
+    console.error("Buttons not found");
+  }
+
   // todo ici gestion boutons radio
   const radios = document.querySelectorAll('.zone-radio input[type="radio"]');
   radios.forEach((radio) => {
@@ -35,7 +45,38 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   // todo fin bouton radio
 
-  var responseContainer = document.getElementById("assistant1a-response");
+  // todo bouton copie sauvegarde contenu
+
+  function copyChatHistory(event) {
+    event.preventDefault(); // Empêche la soumission du formulaire
+    const responseText = document.getElementById(
+      "assistant1a-response"
+    ).innerText;
+    navigator.clipboard
+      .writeText(responseText)
+      .then(() => alert("L'échange a été copié dans le presse-papiers"))
+      .catch((err) => console.error("Erreur lors de la copie:", err));
+  }
+
+  function saveChatHistory(event) {
+    event.preventDefault(); // Empêche la soumission du formulaire
+    const responseText = document.getElementById(
+      "assistant1a-response"
+    ).innerText;
+    const blob = new Blob([responseText], { type: "text/plain" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "response.txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  // todo fin bouton copie contenu
+
+  // var responseContainer = document.getElementById("assistant1a-response");
 
   var cancelButton = document.createElement("button");
   cancelButton.textContent = "Annuler le choix du fichier";
@@ -69,12 +110,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   function updateResponseContainer(content) {
     var responseContainer = document.getElementById("assistant1a-response");
+    var actionsContainer = document.getElementById("response-actions");
     if (content.trim() === "") {
       responseContainer.style.display = "none";
+      actionsContainer.style.display = "none";
     } else {
       responseContainer.innerHTML = content;
       responseContainer.style.display = "block";
+      actionsContainer.style.display = "block";
     }
+    // setButtonStates();
   }
 
   function setButtonStates() {
@@ -91,6 +136,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     stopButton.disabled = !isSpeaking; // Active le bouton arrêter seulement si la synthèse est en cours
     resetButton.disabled = lastAction === null && !isSpeaking; // Active réinitialiser si une action a été effectuée ou en train de parler
+
+    // Activer les boutons de copie et de sauvegarde si des réponses sont présentes
+    var responseText = document.getElementById(
+      "assistant1a-response"
+    ).innerText;
+    if (responseText.trim().length > 0) {
+      copyButton.disabled = false;
+      saveButton.disabled = false;
+    }
   }
 
   questionInput.addEventListener("input", () => {
@@ -111,6 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setLoadingState(true);
 
     var formData = new FormData();
+
     if (fileInput.files.length > 0) {
       formData.append("file", fileInput.files[0]);
     }
