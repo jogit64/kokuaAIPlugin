@@ -55,7 +55,11 @@ function assistant1a_shortcode()
 <div class="widget">
 
     <form id="assistant1a-form" enctype="multipart/form-data" method="post">
-
+        <form action="/set-configuration" method="post">
+            <input type="radio" name="config" value="formal"> Formel<br>
+            <input type="radio" name="config" value="informal"> Informel<br>
+            <button type="submit">Appliquer</button>
+        </form>
         <div class="zone-scrib">
             <!-- <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."> -->
             <button type="button" id="assistant1a-record" class="custom-button">
