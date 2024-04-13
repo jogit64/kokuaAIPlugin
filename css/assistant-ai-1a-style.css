@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   /* background-color: #2b3e50; */
-  background-color: yellow;
+  /* background-color: yellow; */
   /* width: 80%; */
 }
 #assistant1a-form {
@@ -14,6 +14,32 @@
 
   background-color: #2b3e50;
 }
+.zone-radio {
+  display: flex;
+  /* flex-grow: 1; */
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  background-color: #2b3e4f;
+  color: rgb(189, 189, 189);
+  font-size: 12px;
+}
+.zone-radio label.active {
+  color: #0075ff; /* Couleur du label actif */
+}
+
+/* .zone-radio input[type="radio"] { */
+/* margin-right: 2px;  */
+/* margin-bottom: 10px; */
+/* } */
+
+.zone-radio label {
+  display: block; /* Chaque label sur sa propre ligne */
+  /* margin-bottom: 5px; */
+  margin-right: 8px;
+}
+
 .zone-scrib {
   display: flex;
   /* flex-grow: 1; */
@@ -21,9 +47,12 @@
   justify-content: center;
   align-items: center;
   background-color: #2b3e4f;
+  margin-bottom: 30px;
+  margin-top: 30px;
   padding-right: 10px;
   padding-left: 10px;
 }
+
 .second-part {
   display: flex;
   /* flex-grow: 1; */
@@ -103,24 +132,6 @@
   font-size: 12px;
 }
 
-.loader {
-  border: 6px solid #f3f3f3;
-  border-top: 6px solid #3498db;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 /* Style de base pour tous les boutons, états désactivés et actifs spécifiques */
 #assistant1a-form button.custom-button {
   background-color: #4e5d6c;
@@ -151,31 +162,9 @@
   border: 1px solid #4e5d6c;
   border-radius: 5px;
 }
-/* #assistant1a-file-upload-status {
-  width: 100%; 
-  display: flex;
-  justify-content: center; 
-  align-items: center; 
-  align-self: center;
-} */
-
-.charger {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  align-self: center;
-}
-.loader {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  align-self: center;
-}
 
 fieldset {
-  margin-top: 30px;
+  /* margin-top: 30px; */
   /* margin-bottom: 30px; */
   border: 1px solid #4e5d6c;
 }
@@ -184,4 +173,40 @@ fieldset legend {
   font-size: 14px; /* Taille du texte */
 
   padding: 5px 5px; /* Espacement interne pour mieux encadrer le texte */
+}
+
+.charger {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+}
+
+#assistant1a-file-upload-status {
+  /* width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center; */
+  margin-top: 30px;
+  /* background-color: #0075ff; */
+}
+
+.loader {
+  border: 6px solid #f3f3f3;
+
+  border-top: 6px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

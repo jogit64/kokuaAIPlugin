@@ -16,6 +16,25 @@ document.addEventListener("DOMContentLoaded", function () {
   recognition.lang = "fr-FR";
   recognition.continuous = false;
 
+  // todo ici gestion boutons radio
+  const radios = document.querySelectorAll('.zone-radio input[type="radio"]');
+  radios.forEach((radio) => {
+    // Écouter les changements sur les radios
+    radio.addEventListener("change", function () {
+      // Retirer la classe 'active' de tous les labels
+      radios.forEach((r) => r.parentNode.classList.remove("active"));
+      // Ajouter la classe 'active' au label du radio sélectionné
+      if (radio.checked) {
+        radio.parentNode.classList.add("active");
+      }
+    });
+    // Appliquer la classe 'active' sur le label du radio déjà coché lors du chargement
+    if (radio.checked) {
+      radio.parentNode.classList.add("active");
+    }
+  });
+  // todo fin bouton radio
+
   var responseContainer = document.getElementById("assistant1a-response");
 
   var cancelButton = document.createElement("button");
