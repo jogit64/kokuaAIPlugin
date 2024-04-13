@@ -141,20 +141,15 @@
   cursor: pointer;
   transition: background-color 0.3s, opacity 0.3s;
 }
-#copyButton {
-  background-color: #4e5d6c;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  /* transition: background-color 0.3s, opacity 0.3s; */
-}
+#copyButton,
 #saveButton {
   background-color: #4e5d6c;
   color: white;
   padding: 10px 20px;
   border: none;
   cursor: pointer;
+  font-size: 12px;
+  margin-top: 5px;
   /* transition: background-color 0.3s, opacity 0.3s; */
 }
 
