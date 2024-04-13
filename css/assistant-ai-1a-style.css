@@ -134,7 +134,8 @@
 
 /* Style de base pour tous les boutons, états désactivés et actifs spécifiques */
 #assistant1a-form button.custom-button {
-  background-color: #4e5d6c;
+  /* background-color: #4e5d6c; */
+  background-color: #60686f;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -155,7 +156,7 @@
 
 #assistant1a-form button.custom-button:disabled,
 #assistant1a-form input:disabled {
-  opacity: 0.5;
+  opacity: 0.2;
   cursor: not-allowed;
 }
 
