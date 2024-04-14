@@ -11,6 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
   var resetButton = document.getElementById("assistant1a-reset");
   var indicator = document.getElementById("assistant1a-file-upload-status");
 
+  // Initialisation des variables d'état
+  var isRequestPending = false; // Assurez-vous que cette variable est bien initialisée
+  //var lastAction = null; // Initialisation de lastAction pour une utilisation dans le code
+
   // Gestion de la synthèse vocale et de la reconnaissance vocale
   var synth = window.speechSynthesis;
   var recognition = new (window.SpeechRecognition ||
@@ -134,6 +138,10 @@ document.addEventListener("DOMContentLoaded", function () {
     let hasText = questionInput.value.trim().length > 0;
     let isSpeaking = synth.speaking;
 
+    console.log(
+      `hasFile: ${hasFile}, hasText: ${hasText}, isSpeaking: ${isSpeaking}, isRequestPending: ${isRequestPending}`
+    );
+
     // Désactive tous les boutons par défaut
     allButtons.forEach((btn) => (btn.disabled = true));
 
@@ -186,6 +194,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (questionInput.value.trim().length > 0) {
       formData.append("question", questionInput.value.trim());
     }
+
+    // Ajoute la configuration GPT sélectionnée via les boutons radio
+    const selectedConfig = document.querySelector(
+      'input[name="config"]:checked'
+    ).value;
+    formData.append("config", selectedConfig);
 
     // Envoi de la requête au serveur et gestion des réponses
     fetch("https://kokua060424-caea7e92447d.herokuapp.com/ask", {
