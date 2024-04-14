@@ -110,23 +110,42 @@ document.addEventListener("DOMContentLoaded", function () {
     resetSession(); // Appel à resetSession pour réinitialiser la session côté serveur
   }
 
+  function formatLists(text) {
+    // Regex pour détecter les lignes commençant par des tirets
+    return text.replace(/^-\s(.*)/gm, "<ul><li>$1</li></ul>");
+  }
+
   // Met à jour le contenu du conteneur de réponse et gère l'affichage des actions associées.
   function updateResponseContainer(content) {
+    var formattedContent = formatLists(content);
     // Sélection des conteneurs de réponse et d'actions dans le DOM
     var responseContainer = document.getElementById("assistant1a-response");
     var actionsContainer = document.getElementById("response-actions");
 
-    // Vérifie si le contenu est vide ou non
-    if (content.trim() === "") {
+    // // Vérifie si le contenu est vide ou non
+    // if (content.trim() === "") {
+    //   // Cache les conteneurs si le contenu est vide
+    //   responseContainer.style.display = "none";
+    //   actionsContainer.style.display = "none";
+    // } else {
+    //   // Affiche et met à jour les conteneurs avec le nouveau contenu si ce dernier n'est pas vide
+    //   responseContainer.innerHTML = content;
+    //   responseContainer.style.display = "block";
+    //   actionsContainer.style.display = "block";
+    // }
+
+    // Vérifie si le contenu formatté est vide ou non
+    if (formattedContent.trim() === "") {
       // Cache les conteneurs si le contenu est vide
       responseContainer.style.display = "none";
       actionsContainer.style.display = "none";
     } else {
-      // Affiche et met à jour les conteneurs avec le nouveau contenu si ce dernier n'est pas vide
-      responseContainer.innerHTML = content;
+      // Affiche et met à jour les conteneurs avec le contenu formaté si ce dernier n'est pas vide
+      responseContainer.innerHTML = formattedContent; // Utilisez formattedContent ici
       responseContainer.style.display = "block";
       actionsContainer.style.display = "block";
     }
+
     // Met à jour l'état des boutons (commenté ici, à décommenter si utilisé)
     // setButtonStates();
   }
