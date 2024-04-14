@@ -193,7 +193,12 @@ document.addEventListener("DOMContentLoaded", function () {
       body: formData,
       credentials: "include",
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok " + response.statusText);
+        }
+        return response.json();
+      })
       .then((data) => {
         updateResponseContainer(data.response);
         if (isVoice) {
@@ -205,6 +210,9 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((error) => {
         console.error("Error:", error);
+        alert(
+          "Une erreur s'est produite lors de la communication avec le serveur. Veuillez réessayer."
+        ); // Notifie l'utilisateur
         updateResponseContainer("Erreur lors de la requête.");
       })
       .finally(() => {
