@@ -124,6 +124,14 @@ document.addEventListener("DOMContentLoaded", function () {
     lastAction = null;
     setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
     resetSession(); // Appel à resetSession pour réinitialiser la session côté serveur
+    clearHistory(); // Ajout pour vider l'historique
+  }
+
+  // Ajout d'une nouvelle fonction pour effacer l'historique
+  function clearHistory() {
+    var historyContainer = document.getElementById("assistant1a-history");
+    historyContainer.innerHTML = ""; // Efface le contenu de l'historique
+    historyContainer.style.display = "none";
   }
 
   function formatLists(text) {
@@ -369,10 +377,20 @@ document.addEventListener("DOMContentLoaded", function () {
     handleSpeechEnd();
   };
 
-  // Fonction pour faire parler l'assistant avec le texte donné
+  function removeHtmlTags(text) {
+    var doc = new DOMParser().parseFromString(text, "text/html");
+    return doc.body.textContent || "";
+  }
+
+  function removeHtmlTags(text) {
+    var doc = new DOMParser().parseFromString(text, "text/html");
+    return doc.body.textContent || "";
+  }
+
+  // Utilisation avant de faire parler le synthétiseur vocal
   function speak(text) {
-    console.log("Speaking initiated."); // Pour vérifier que la fonction est appelée
-    var utterThis = new SpeechSynthesisUtterance(text);
+    var cleanText = removeHtmlTags(text); // Nettoyer le texte
+    var utterThis = new SpeechSynthesisUtterance(cleanText);
     if (selectedVoice) {
       utterThis.voice = selectedVoice;
     }
