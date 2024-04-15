@@ -389,6 +389,7 @@ document.addEventListener("DOMContentLoaded", function () {
     stopButton.style.display = "none"; // Rend le bouton Arrêter invisible
     stopButton.disabled = true; // Désactive le bouton Arrêter
     // setButtonStates();
+    microButton.disabled = false;
     questionInput.value = "";
   }
 
