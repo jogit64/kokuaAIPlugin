@@ -2,10 +2,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* background-color: #2b3e50; */
-  /* background-color: yellow; */
-  /* width: 80%; */
+  width: 100%; /* Assurez-vous que ce conteneur est aussi flexible */
+  max-width: 1000px; /* ou une autre largeur maximale appropriée */
+  margin: auto; /* Centre le widget si moins large que la page */
 }
+
 #assistant1a-form {
   display: flex;
   flex-grow: 1;
@@ -15,17 +16,19 @@
   background-color: #2b3e50;
 }
 .zone-radio,
-.zone-checkbox {
+.zone-checkbox,
+#assistant1a-file-section {
   display: flex;
   /* flex-grow: 1; */
-  flex-direction: row;
+  /* flex-direction: row; */
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
+  /* align-items: center; */
   background-color: #2b3e4f;
   color: rgb(189, 189, 189);
   font-size: 12px;
 }
+
 .zone-radio label.active,
 .zone-checkbox label.active {
   color: #0075ff; /* Couleur du label actif */
@@ -46,7 +49,6 @@
 
 .zone-scrib {
   display: flex;
-  /* flex-grow: 1; */
   flex-direction: row;
   justify-content: center;
   align-items: center;
@@ -55,38 +57,49 @@
   margin-top: 30px;
   padding-right: 10px;
   padding-left: 10px;
+  width: 100%;
 }
 
 .zone-ctrlFIcSess {
   display: flex;
-  /* flex-grow: 1; */
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-
+  align-items: stretch;
   padding-right: 10px;
   padding-left: 10px;
 }
 
-#assistant1a-submit,
+.zone-ctrlFIcSess fieldset {
+  margin: 5px;
+  border: 1px solid #4e5d6c;
+  padding: 10px;
+  box-sizing: border-box;
+  /* width: calc(50% - 10px);
+  min-width: 300px; */
+}
+
+@media (max-width: 600px) {
+  .zone-ctrlFIcSess fieldset {
+    width: 100%;
+  }
+}
+
 #assistant1a-record,
-#assistant1a-stop,
-#assistant1a-file-submit {
+#assistant1a-stop {
   margin-left: 4px;
 }
 
 #assistant1a-question {
-  /* flex-grow: 1; */
-  margin-right: 8px;
-  margin-left: 8px;
-  font-size: 16px;
+  width: 100%; /* Utilise la largeur complète de son conteneur */
+  max-width: 600px; /* Adaptez cette valeur en fonction de votre design */
+  min-height: 50px; /* Hauteur minimale pour améliorer la visibilité */
+  margin: 8px 8px; /* Centre horizontalement et ajoute un peu d'espace vertical */
+  padding: 10px;
+  background-color: #2b3e50;
   color: rgb(255, 255, 255);
   border: 1px solid #4e5d6c;
-
-  padding: 10px;
-  min-height: 50px;
-  background-color: #2b3e50;
-  width: 550px;
+  box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur calculée */
 }
 
 #assistant1a-file-section {
@@ -110,6 +123,10 @@
 #assistant1a-cancel-file {
   font-size: 12px;
   margin-right: 8px;
+}
+
+#assistant1a-file-submit {
+  margin-top: 8px;
 }
 
 #assistant1a-history,
@@ -191,24 +208,29 @@
   border: 1px solid #4e5d6c;
   border-radius: 5px;
 
-  width: 800px; /* Fixe la largeur à 500px */
-  max-width: 100%; /* Assure que la largeur ne dépasse pas celle de l'élément conteneur */
+  width: 100%; /* Utilisez 100% pour la largeur pour une meilleure adaptabilité */
+  max-width: 800px; /* Fixe la largeur maximale à 800px */
   overflow-x: hidden; /* Empêche le débordement horizontal */
   overflow-y: auto; /* Permet le défilement vertical si le contenu est trop long */
 
   background-color: #4e5d6c; /* Couleur de fond légère pour les conteneurs */
   border: 1px solid #ccc;
+  box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur calculée */
 }
+
 #assistant1a-history {
-  height: 300px;
-  overflow-y: auto;
+  height: 300px; /* Fixe la hauteur pour l'histoire */
 }
 
 fieldset {
-  /* margin-top: 30px; */
-  /* margin-bottom: 30px; */
+  /* width: 100%; */
+  /* max-width: 800px; */
+  margin: auto; /* Centre le fieldset si moins large que max-width */
   border: 1px solid #4e5d6c;
+  padding: 10px;
+  box-sizing: border-box;
 }
+
 fieldset legend {
   color: #fff; /* Couleur du texte */
   font-size: 14px; /* Taille du texte */

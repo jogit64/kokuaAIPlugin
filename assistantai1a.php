@@ -95,8 +95,6 @@ function assistant1a_shortcode()
                 <button type="button" id="assistant1a-submit" class="custom-button">
                     <img src="<?php echo plugins_url('assets/sortie.png', __FILE__); ?>" alt="Demander">
                 </button>
-
-
             </div>
 
             <div class="charger">
