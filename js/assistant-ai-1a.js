@@ -12,6 +12,16 @@ document.addEventListener("DOMContentLoaded", function () {
   var indicator = document.getElementById("assistant1a-file-upload-status");
   var selectedVoice; // Variable globale pour stocker la voix sélectionnée
 
+  const consignes = {
+    salarie: "Veuillez préparer vos documents relatifs à l'entretien salarié.",
+    direction:
+      "Assurez-vous d'avoir tous les rapports de direction nécessaires.",
+    document: "Préparez tous les documents à analyser pour cette session.",
+    mp3: "Veuillez charger les fichiers MP3 que vous souhaitez convertir en texte.",
+    discussion: "Préparez vos points de discussion et questions à l'avance.",
+  };
+  const instructionDiv = document.getElementById("instructionText");
+
   // Initialisation des variables d'état
   var isRequestPending = false; // Assurez-vous que cette variable est bien initialisée
   //var lastAction = null; // Initialisation de lastAction pour une utilisation dans le code
@@ -41,11 +51,16 @@ document.addEventListener("DOMContentLoaded", function () {
       radios.forEach((r) => r.parentNode.classList.remove("active"));
       if (radio.checked) {
         radio.parentNode.classList.add("active");
+        instructionDiv.textContent = consignes[radio.value];
       }
     });
     if (radio.checked) {
       radio.parentNode.classList.add("active");
     }
+    // Assurez-vous de déclencher l'événement 'change' après que tous les écouteurs sont en place
+    document
+      .querySelector('.zone-radio input[type="radio"]:checked')
+      .dispatchEvent(new Event("change"));
   });
 
   // Fonction pour copier l'historique du chat dans le presse-papiers
@@ -373,7 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Handling speech end, updating button states."); // Log pour diagnostic
     stopButton.style.display = "none"; // Rend le bouton Arrêter invisible
     stopButton.disabled = true; // Désactive le bouton Arrêter
-    setButtonStates(); // Mise à jour de l'état des autres boutons si nécessaire
+    // setButtonStates();
     questionInput.value = "";
   }
 

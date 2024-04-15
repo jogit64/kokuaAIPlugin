@@ -7,27 +7,34 @@
   margin: auto; /* Centre le widget si moins large que la page */
 }
 
+#instructionText {
+  color: yellow;
+  font-weight: 100;
+}
+
 #assistant1a-form {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
   align-items: center;
-
   background-color: #2b3e50;
 }
 .zone-radio,
 .zone-checkbox,
 #assistant1a-file-section {
   display: flex;
-  /* flex-grow: 1; */
-  /* flex-direction: row; */
   flex-wrap: wrap;
   justify-content: center;
-  /* align-items: center; */
   background-color: #2b3e4f;
   color: rgb(189, 189, 189);
   font-size: 12px;
 }
+
+/* #assistant1a-file-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+} */
 
 .zone-radio label.active,
 .zone-checkbox label.active {
@@ -36,31 +43,29 @@
 #toggleHistoryCheckbox {
   color: rgb(189, 189, 189);
 }
-/* .zone-radio input[type="radio"] { */
-/* margin-right: 2px;  */
-/* margin-bottom: 10px; */
-/* } */
 
 .zone-radio label {
   display: block; /* Chaque label sur sa propre ligne */
   /* margin-bottom: 5px; */
   margin-right: 8px;
 }
+.zone-containRadio fieldset {
+  /* background-color: violet; */
+  width: 100%;
+}
 
-.zone-scrib {
+.zone-containRadio {
   display: flex;
   flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  background-color: #2b3e4f;
-  margin-bottom: 30px;
-  margin-top: 30px;
+  /* background-color: yellow; */
+
   padding-right: 10px;
   padding-left: 10px;
   width: 100%;
 }
 
 .zone-ctrlFIcSess {
+  /* background-color: green; */
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -68,10 +73,25 @@
   align-items: stretch;
   padding-right: 10px;
   padding-left: 10px;
+  margin-top: 5px;
+  width: 100%;
+}
+
+.zone-scrib {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  /* background-color: blue; */
+  margin-bottom: 30px;
+  margin-top: 30px;
+  padding-right: 10px;
+  padding-left: 10px;
+  width: 100%;
 }
 
 .zone-ctrlFIcSess fieldset {
-  margin: 5px;
+  /* margin: 5px; */
   border: 1px solid #4e5d6c;
   padding: 10px;
   box-sizing: border-box;
@@ -102,31 +122,20 @@
   box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur calculée */
 }
 
-#assistant1a-file-section {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  /* margin-top: 20px; */
-  /* width: 100%; */
+#assistant1a-file-submit,
+#assistant1a-cancel-file,
+#assistant1a-file,
+#assistant1a-reset {
+  font-size: 12px;
+  margin-right: 8px;
+  margin-top: 8px;
+  background-color: yellow;
 }
 
 #assistant1a-file {
-  justify-content: flex-start;
-  margin-right: 8px;
-  padding: 10px 20px;
+  padding: 10px 10px;
   color: #ffffff;
   background-color: #485563;
-  font-size: 12px;
-}
-
-#assistant1a-file-submit,
-#assistant1a-cancel-file {
-  font-size: 12px;
-  margin-right: 8px;
-}
-
-#assistant1a-file-submit {
-  margin-top: 8px;
 }
 
 #assistant1a-history,
@@ -151,16 +160,13 @@
   width: 24px;
   height: auto;
 }
-#assistant1a-reset {
-  font-size: 12px;
-}
 
 /* Style de base pour tous les boutons, états désactivés et actifs spécifiques */
 #assistant1a-form button.custom-button {
   /* background-color: #4e5d6c; */
   background-color: #60686f;
   color: white;
-  padding: 10px 20px;
+  padding: 15px 20px;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s, opacity 0.3s;
@@ -223,9 +229,8 @@
 }
 
 fieldset {
-  /* width: 100%; */
-  /* max-width: 800px; */
   margin: auto; /* Centre le fieldset si moins large que max-width */
+  margin-left: 2px;
   border: 1px solid #4e5d6c;
   padding: 10px;
   box-sizing: border-box;
@@ -244,15 +249,6 @@ fieldset legend {
   justify-content: center;
   align-items: center;
   align-self: center;
-}
-
-#assistant1a-file-upload-status {
-  /* width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center; */
-  margin-top: 30px;
-  /* background-color: #0075ff; */
 }
 
 .loader {
