@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var questionInput = document.getElementById("assistant1a-question");
   var resetButton = document.getElementById("assistant1a-reset");
   var indicator = document.getElementById("assistant1a-file-upload-status");
+  var selectedVoice; // Variable globale pour stocker la voix sélectionnée
 
   // Initialisation des variables d'état
   var isRequestPending = false; // Assurez-vous que cette variable est bien initialisée
@@ -117,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Gestion de la checkbox pour afficher l'historique
   var historyContainer = document.getElementById("assistant1a-history");
+  var isFirstExchange = true;
   var toggleHistoryCheckbox = document.getElementById("toggleHistoryCheckbox");
 
   // Initialise l'affichage de l'historique en fonction de l'état initial de la case à cocher
@@ -131,35 +133,62 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Met à jour le contenu du conteneur de réponse et gère l'affichage des actions associées.
   function updateResponseContainer(content) {
-    var formattedContent = formatLists(content);
-    // Sélection des conteneurs de réponse et d'actions dans le DOM
+    var formattedContent = formatLists(content); // Formate les listes si nécessaire
     var responseContainer = document.getElementById("assistant1a-response");
+    var questionText = document
+      .getElementById("assistant1a-question")
+      .value.trim();
     var actionsContainer = document.getElementById("response-actions");
     var historyContainer = document.getElementById("assistant1a-history");
 
-    // Ajoute le contenu formaté à l'historique, indépendamment du fait qu'il soit vide ou non
-    var newHistoryEntry = document.createElement("p");
-    newHistoryEntry.innerHTML = formattedContent;
-    historyContainer.appendChild(newHistoryEntry);
-    // Fait défiler automatiquement l'historique vers le bas
-    historyContainer.scrollTop = historyContainer.scrollHeight;
-
-    // Vérifie si le contenu formatté est vide ou non
-    if (formattedContent.trim() === "") {
-      // Cache les conteneurs si le contenu est vide
+    // Affiche la réponse actuelle dans le conteneur de réponse
+    if (formattedContent.trim() !== "") {
+      responseContainer.innerHTML = formattedContent;
+      responseContainer.style.display = "block";
+      actionsContainer.style.display = "block";
+    } else {
       responseContainer.style.display = "none";
       actionsContainer.style.display = "none";
-    } else {
-      // Affiche et met à jour les conteneurs avec le contenu formaté si ce dernier n'est pas vide
-      responseContainer.innerHTML = formattedContent; // Utilisez formattedContent ici
-      responseContainer.style.display = "block";
-      // responseContainer.style.display =
-      //   formattedContent.trim() === "" ? "none" : "block";
-      actionsContainer.style.display = "block";
     }
 
-    // Met à jour l'état des boutons (commenté ici, à décommenter si utilisé)
-    // setButtonStates();
+    // Ajoute la question à l'historique, sans préfixe dans le texte
+    if (questionText && !isFirstExchange) {
+      addHistoryEntry(questionText, "", "question");
+    }
+
+    // Ajoute la réponse à l'historique, sans préfixe dans le texte
+    if (formattedContent.trim() !== "" && !isFirstExchange) {
+      addHistoryEntry("", formattedContent, "response");
+    }
+
+    // Le premier échange est maintenant passé, on actualise l'indicateur
+    isFirstExchange = false;
+  }
+
+  // Fonction pour ajouter des entrées à l'historique avec classe pour style
+  function addHistoryEntry(questionText, responseText, type) {
+    var entry = document.createElement("p");
+    entry.className = type; // Classe pour appliquer un style conditionnel
+
+    // Créer un élément span pour le préfixe en gras
+    var prefix = document.createElement("span");
+    prefix.className = "prefix";
+    prefix.innerHTML = type === "question" ? "VOUS" : "ASSISTANT";
+
+    // Créer un élément span pour le texte, non gras
+    var message = document.createElement("span");
+    message.className = "message";
+    // Assurez-vous que le texte est transmis sans le préfixe
+    message.innerHTML = type === "question" ? questionText : responseText;
+
+    // Ajouter les éléments span à l'entrée, avec le message sur une nouvelle ligne
+    entry.appendChild(prefix);
+    // entry.appendChild(document.createElement("br")); // Saut de ligne après le préfixe
+    entry.appendChild(message);
+
+    var historyContainer = document.getElementById("assistant1a-history");
+    historyContainer.appendChild(entry);
+    historyContainer.scrollTop = historyContainer.scrollHeight; // Assure le défilement vers le bas
   }
 
   // Met à jour les états des boutons en fonction des conditions spécifiques
@@ -310,10 +339,42 @@ document.addEventListener("DOMContentLoaded", function () {
     setButtonStates(); // Met à jour les états des boutons après la fin de l'enregistrement
   };
 
+  // Initialisation des voix et écoute de la fin de la parole
+  synth.onvoiceschanged = function () {
+    var voices = synth.getVoices();
+    // console.log(voices); // Affiche toutes les voix disponibles dans la console
+    // voices.forEach((voice, index) => {
+    //   console.log(`${index + 1}: ${voice.name} (${voice.lang})`);
+    // });
+  };
+
+  // Écouteur pour la fin de la synthèse vocale, défini une seule fois
+  synth.onend = function () {
+    console.log("Speech synthesis has ended."); // Log pour diagnostic
+    handleSpeechEnd();
+  };
+
   // Fonction pour faire parler l'assistant avec le texte donné
   function speak(text) {
-    var utterThis = new SpeechSynthesisUtterance(text); // Prépare le texte pour la synthèse
-    synth.speak(utterThis); // Fait parler le synthétiseur
+    console.log("Speaking initiated."); // Pour vérifier que la fonction est appelée
+    var utterThis = new SpeechSynthesisUtterance(text);
+    if (selectedVoice) {
+      utterThis.voice = selectedVoice;
+    }
+    utterThis.onend = function () {
+      console.log("Local speech synthesis has ended."); // Log de fin de parole
+      handleSpeechEnd();
+    };
+    synth.speak(utterThis);
+  }
+
+  // Fonction pour gérer la fin de la parole
+  function handleSpeechEnd() {
+    console.log("Handling speech end, updating button states."); // Log pour diagnostic
+    stopButton.style.display = "none"; // Rend le bouton Arrêter invisible
+    stopButton.disabled = true; // Désactive le bouton Arrêter
+    setButtonStates(); // Mise à jour de l'état des autres boutons si nécessaire
+    questionInput.value = "";
   }
 
   // Fonction pour réinitialiser la session sur le serveur

@@ -294,3 +294,22 @@ fieldset legend {
 #assistant1a-response ol + h3 {
   margin-top: 1.5em;
 }
+
+#assistant1a-history .question,
+#assistant1a-history .response {
+  color: lightgrey; /* Couleur pour les questions */
+  font-weight: bold; /* Mettez en gras */
+}
+
+#assistant1a-history .prefix {
+  font-weight: bold; /* Met en gras seulement le préfixe */
+  display: block;
+  margin-bottom: 0;
+}
+
+#assistant1a-history .message {
+  font-weight: normal; /* Assure que le message n'est pas en gras */
+  display: block;
+  margin-top: 0;
+  margin-left: 20px;
+}
