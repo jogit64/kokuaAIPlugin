@@ -231,8 +231,14 @@ fieldset legend {
 #assistant1a-response h3 {
   margin-top: 0.8em;
   margin-bottom: 0.4em;
-  color: red; /* Exemple de couleur */
+  color: #eaff00; /* Exemple de couleur */
   font-size: 1.2em; /* Taille de police plus petite pour une harmonie avec le texte */
+}
+#assistant1a-response h4 {
+  margin-top: 0.8em;
+  margin-bottom: 0.4em;
+  color: rgb(156, 156, 156); /* Exemple de couleur */
+  font-size: 1em; /* Taille de police plus petite pour une harmonie avec le texte */
 }
 
 /* Style des paragraphes dans le conteneur de réponse */
