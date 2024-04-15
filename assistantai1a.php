@@ -65,23 +65,7 @@ function assistant1a_shortcode()
                     <label><input type="radio" name="config" value="discussion"> Discussion</label><br>
                 </div>
             </fieldset>
-
-            <div class="zone-scrib">
-                <!-- <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."> -->
-                <button type="button" id="assistant1a-record" class="custom-button">
-                    <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
-                </button>
-                <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
-                <textarea id="assistant1a-question" name="question" placeholder="Posez votre question ici..."></textarea>
-
-                <!-- <button type="button" id="assistant1a-submit" class="custom-button">Demander</button> -->
-                <button type="button" id="assistant1a-submit" class="custom-button">
-                    <img src="<?php echo plugins_url('assets/sortie.png', __FILE__); ?>" alt="Demandera">
-                </button>
-
-
-            </div>
-            <div class="second-part">
+            <div class="zone-ctrlFIcSess">
 
                 <fieldset>
                     <legend>Gestion du fichier</legend>
@@ -98,6 +82,23 @@ function assistant1a_shortcode()
                 </fieldset>
 
             </div>
+
+            <div class="zone-scrib">
+                <!-- <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."> -->
+                <button type="button" id="assistant1a-record" class="custom-button">
+                    <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
+                </button>
+                <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
+                <textarea id="assistant1a-question" name="question" placeholder="Posez votre question ici..."></textarea>
+
+                <!-- <button type="button" id="assistant1a-submit" class="custom-button">Demander</button> -->
+                <button type="button" id="assistant1a-submit" class="custom-button">
+                    <img src="<?php echo plugins_url('assets/sortie.png', __FILE__); ?>" alt="Demander">
+                </button>
+
+
+            </div>
+
             <div class="charger">
                 <div id="assistant1a-file-upload-status" style="display:none;">
                     <div class="loader"></div>
@@ -108,11 +109,18 @@ function assistant1a_shortcode()
                 <!-- Actions cachées par défaut -->
                 <button id="copyButton">Copier l'échange</button>
                 <button id="saveButton">Sauvegarder l'échange</button>
+
+                <label>
+                    <input type="checkbox" id="toggleHistoryCheckbox" unchecked>
+                    Afficher l'historique
+                </label>
+
             </div>
+
 
         </form>
 
-
+        <div id="assistant1a-history"></div>
     </div>
 
 

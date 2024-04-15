@@ -115,24 +115,34 @@ document.addEventListener("DOMContentLoaded", function () {
     return text.replace(/^-\s(.*)/gm, "<ul><li>$1</li></ul>");
   }
 
+  // Gestion de la checkbox pour afficher l'historique
+  var historyContainer = document.getElementById("assistant1a-history");
+  var toggleHistoryCheckbox = document.getElementById("toggleHistoryCheckbox");
+
+  // Initialise l'affichage de l'historique en fonction de l'état initial de la case à cocher
+  historyContainer.style.display = toggleHistoryCheckbox.checked
+    ? "block"
+    : "none";
+
+  // Gestionnaire pour la case à cocher
+  toggleHistoryCheckbox.addEventListener("change", function () {
+    historyContainer.style.display = this.checked ? "block" : "none";
+  });
+
   // Met à jour le contenu du conteneur de réponse et gère l'affichage des actions associées.
   function updateResponseContainer(content) {
     var formattedContent = formatLists(content);
     // Sélection des conteneurs de réponse et d'actions dans le DOM
     var responseContainer = document.getElementById("assistant1a-response");
     var actionsContainer = document.getElementById("response-actions");
+    var historyContainer = document.getElementById("assistant1a-history");
 
-    // // Vérifie si le contenu est vide ou non
-    // if (content.trim() === "") {
-    //   // Cache les conteneurs si le contenu est vide
-    //   responseContainer.style.display = "none";
-    //   actionsContainer.style.display = "none";
-    // } else {
-    //   // Affiche et met à jour les conteneurs avec le nouveau contenu si ce dernier n'est pas vide
-    //   responseContainer.innerHTML = content;
-    //   responseContainer.style.display = "block";
-    //   actionsContainer.style.display = "block";
-    // }
+    // Ajoute le contenu formaté à l'historique, indépendamment du fait qu'il soit vide ou non
+    var newHistoryEntry = document.createElement("p");
+    newHistoryEntry.innerHTML = formattedContent;
+    historyContainer.appendChild(newHistoryEntry);
+    // Fait défiler automatiquement l'historique vers le bas
+    historyContainer.scrollTop = historyContainer.scrollHeight;
 
     // Vérifie si le contenu formatté est vide ou non
     if (formattedContent.trim() === "") {
@@ -143,6 +153,8 @@ document.addEventListener("DOMContentLoaded", function () {
       // Affiche et met à jour les conteneurs avec le contenu formaté si ce dernier n'est pas vide
       responseContainer.innerHTML = formattedContent; // Utilisez formattedContent ici
       responseContainer.style.display = "block";
+      // responseContainer.style.display =
+      //   formattedContent.trim() === "" ? "none" : "block";
       actionsContainer.style.display = "block";
     }
 
