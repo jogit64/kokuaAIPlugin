@@ -13,13 +13,15 @@ document.addEventListener("DOMContentLoaded", function () {
   var selectedVoice; // Variable globale pour stocker la voix sélectionnée
 
   const consignes = {
-    salarie: "Veuillez préparer vos documents relatifs à l'entretien salarié.",
+    salarie: "Copiez et collez l'entretien ou importez un fichier (DOC, DOCX).",
     direction:
-      "Assurez-vous d'avoir tous les rapports de direction nécessaires.",
-    document: "Préparez tous les documents à analyser pour cette session.",
-    mp3: "Veuillez charger les fichiers MP3 que vous souhaitez convertir en texte.",
-    discussion: "Préparez vos points de discussion et questions à l'avance.",
+      "Copiez et collez l'entretien ou importez un fichier (DOC, DOCX).",
+    document: "Importez le fichier (PDF) à analyser pour cette session.",
+    mp3: "Utilisez l'importation de fichier pour partager l'enregistrement MP3 à transcrire.",
+    discussion:
+      "Utilisez cet espace pour discuter de la rédaction et de la structuration de votre rapport.",
   };
+
   const instructionDiv = document.getElementById("instructionText");
 
   // Initialisation des variables d'état

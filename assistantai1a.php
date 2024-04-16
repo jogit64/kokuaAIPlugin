@@ -75,7 +75,7 @@ function assistant1a_shortcode()
                 <fieldset>
                     <legend>Gestion du fichier</legend>
                     <div id="assistant1a-file-section">
-                        <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx">
+                        <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx,.pdf,.ppt,.pptx,.txt">
                         <button type="button" id="assistant1a-file-submit" class="custom-button">Envoyer le fichier</button>
                     </div>
                 </fieldset>
