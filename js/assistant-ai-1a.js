@@ -266,12 +266,52 @@ document.addEventListener("DOMContentLoaded", function () {
     setButtonStates();
   }
 
+  // Fonction pour vérifier l'état d'une tâche en arrière-plan
+  function checkTaskStatus(jobId) {
+    fetch(`https://kokua060424-caea7e92447d.herokuapp.com/results/${jobId}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP status ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Task Status:", data);
+        // Assurez-vous d'arrêter l'intervalle si la tâche est terminée ou a échoué
+        if (data.status === "finished" || data.status === "failed") {
+          clearInterval(checkInterval);
+          checkInterval = null;
+          if (data.status === "finished") {
+            updateResponseContainer(data.result);
+          } else {
+            alert("Task failed: " + data.error);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error checking task status:", error);
+        clearInterval(checkInterval);
+      });
+  }
+
+  // Variable pour stocker l'ID de l'intervalle
+  let checkInterval;
+
+  // Fonction pour commencer à interroger le statut de la tâche
+  function startTaskStatusCheck(jobId) {
+    if (checkInterval !== null) {
+      clearInterval(checkInterval); // S'assure qu'aucun intervalle précédent ne tourne
+    }
+    checkInterval = setInterval(() => {
+      checkTaskStatus(jobId);
+    }, 5000);
+  }
+
   // Envoie une requête au serveur
   function sendRequest(isVoice = false) {
     if (isRequestPending) return;
     setLoadingState(true);
 
-    // Préparation des données à envoyer
     var formData = new FormData();
     if (fileInput.files.length > 0) {
       formData.append("file", fileInput.files[0]);
@@ -280,13 +320,11 @@ document.addEventListener("DOMContentLoaded", function () {
       formData.append("question", questionInput.value.trim());
     }
 
-    // Ajoute la configuration GPT sélectionnée via les boutons radio
     const selectedConfig = document.querySelector(
       'input[name="config"]:checked'
     ).value;
     formData.append("config", selectedConfig);
 
-    // Envoi de la requête au serveur et gestion des réponses
     fetch("https://kokua060424-caea7e92447d.herokuapp.com/ask", {
       method: "POST",
       body: formData,
@@ -299,26 +337,27 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json();
       })
       .then((data) => {
-        updateResponseContainer(data.response);
-        if (isVoice) {
-          speak(data.response); // Fonction pour activer la synthèse vocale (non fournie ici)
-        }
-        if (!isVoice && fileInput.files.length > 0) {
-          cancelButton.style.display = "none";
+        if (data.job_id) {
+          startTaskStatusCheck(data.job_id); // Démarrez la vérification de l'état avec l'ID de job obtenu
+        } else {
+          updateResponseContainer(data.response);
+          if (isVoice) {
+            speak(data.response);
+          }
         }
       })
       .catch((error) => {
         console.error("Error:", error);
         alert(
           "Une erreur s'est produite lors de la communication avec le serveur. Veuillez réessayer."
-        ); // Notifie l'utilisateur
+        );
         updateResponseContainer("Erreur lors de la requête.");
       })
       .finally(() => {
-        if (!isVoice) {
-          questionInput.value = ""; // Efface le champ de texte si la requête n'est pas vocale
-        }
         setLoadingState(false);
+        if (!isVoice) {
+          questionInput.value = ""; // Effacer le champ de texte si la requête n'est pas vocale
+        }
       });
   }
 
