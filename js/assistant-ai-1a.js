@@ -145,8 +145,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Gestion de la checkbox pour afficher l'historique
   var historyContainer = document.getElementById("assistant1a-history");
-  var isFirstExchange = true;
+  //  !suppr isFirstExchange
+  // var isFirstExchange = true;
   var toggleHistoryCheckbox = document.getElementById("toggleHistoryCheckbox");
+  console.log("Checkbox Checked Initial State:", toggleHistoryCheckbox.checked);
 
   // Initialise l'affichage de l'historique en fonction de l'état initial de la case à cocher
   historyContainer.style.display = toggleHistoryCheckbox.checked
@@ -166,6 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var questionText = document
       .getElementById("assistant1a-question")
       .value.trim();
+    console.log("Question Text:", questionText); // Ajout pour diagnostic
     var actionsContainer = document.getElementById("response-actions");
     var historyContainer = document.getElementById("assistant1a-history"); // Accès au conteneur d'historique
 
@@ -175,22 +178,18 @@ document.addEventListener("DOMContentLoaded", function () {
       responseContainer.style.display = "block";
       actionsContainer.style.display = "block";
       historyContainer.style.display = "block"; // Assurez-vous que l'historique est visible
+
+      // Ajoute la réponse à l'historique
+      addHistoryEntry("", formattedContent, "response");
     } else {
       responseContainer.style.display = "none";
       actionsContainer.style.display = "none";
     }
 
-    // Ajoute la question et la réponse à l'historique si ce n'est pas le premier échange
-    if (!isFirstExchange) {
-      if (questionText) {
-        addHistoryEntry(questionText, "", "question");
-      }
-      if (formattedContent.trim() !== "") {
-        addHistoryEntry("", formattedContent, "response");
-      }
+    // Ajoute la question à l'historique si elle existe
+    if (questionText) {
+      addHistoryEntry(questionText, "", "question");
     }
-
-    isFirstExchange = false; // Le premier échange est maintenant passé
   }
 
   // Fonction pour ajouter des entrées à l'historique avec classe pour style
