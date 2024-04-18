@@ -121,7 +121,9 @@ document.addEventListener("DOMContentLoaded", function () {
   function resetUI() {
     questionInput.value = "";
     fileInput.value = "";
-    updateResponseContainer(""); // Met à jour le conteneur de réponse, fonction non fournie
+    // isFirstExchange = true;
+    // updateResponseContainer(""); // Met à jour le conteneur de réponse, fonction non fournie
+    updateResponseContainer({ response: { response: "" } });
     cancelButton.style.display = "none";
     lastAction = null;
     setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
@@ -157,37 +159,38 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Met à jour le contenu du conteneur de réponse et gère l'affichage des actions associées.
-  function updateResponseContainer(content) {
+  function updateResponseContainer(data) {
+    let content = data.response.response; // Assurez-vous que data.response contient le HTML à afficher
     var formattedContent = formatLists(content); // Formate les listes si nécessaire
     var responseContainer = document.getElementById("assistant1a-response");
     var questionText = document
       .getElementById("assistant1a-question")
       .value.trim();
     var actionsContainer = document.getElementById("response-actions");
-    var historyContainer = document.getElementById("assistant1a-history");
+    var historyContainer = document.getElementById("assistant1a-history"); // Accès au conteneur d'historique
 
     // Affiche la réponse actuelle dans le conteneur de réponse
     if (formattedContent.trim() !== "") {
       responseContainer.innerHTML = formattedContent;
       responseContainer.style.display = "block";
       actionsContainer.style.display = "block";
+      historyContainer.style.display = "block"; // Assurez-vous que l'historique est visible
     } else {
       responseContainer.style.display = "none";
       actionsContainer.style.display = "none";
     }
 
-    // Ajoute la question à l'historique, sans préfixe dans le texte
-    if (questionText && !isFirstExchange) {
-      addHistoryEntry(questionText, "", "question");
+    // Ajoute la question et la réponse à l'historique si ce n'est pas le premier échange
+    if (!isFirstExchange) {
+      if (questionText) {
+        addHistoryEntry(questionText, "", "question");
+      }
+      if (formattedContent.trim() !== "") {
+        addHistoryEntry("", formattedContent, "response");
+      }
     }
 
-    // Ajoute la réponse à l'historique, sans préfixe dans le texte
-    if (formattedContent.trim() !== "" && !isFirstExchange) {
-      addHistoryEntry("", formattedContent, "response");
-    }
-
-    // Le premier échange est maintenant passé, on actualise l'indicateur
-    isFirstExchange = false;
+    isFirstExchange = false; // Le premier échange est maintenant passé
   }
 
   // Fonction pour ajouter des entrées à l'historique avec classe pour style
@@ -277,12 +280,11 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .then((data) => {
         console.log("Task Status:", data);
-        // Assurez-vous d'arrêter l'intervalle si la tâche est terminée ou a échoué
         if (data.status === "finished" || data.status === "failed") {
           clearInterval(checkInterval);
-          checkInterval = null;
+          checkInterval = null; // Réinitialiser checkInterval après avoir arrêté l'intervalle
           if (data.status === "finished") {
-            updateResponseContainer(data.result);
+            updateResponseContainer(data);
           } else {
             alert("Task failed: " + data.error);
           }
@@ -291,6 +293,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch((error) => {
         console.error("Error checking task status:", error);
         clearInterval(checkInterval);
+        checkInterval = null; // Réinitialiser checkInterval aussi ici après avoir arrêté l'intervalle
       });
   }
 
