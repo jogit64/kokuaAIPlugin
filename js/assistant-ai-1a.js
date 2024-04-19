@@ -126,7 +126,18 @@ document.addEventListener("DOMContentLoaded", function () {
     lastAction = null;
     setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
     resetSession(); // Appel à resetSession pour réinitialiser la session côté serveur
-    clearHistory(); // Ajout pour vider l'historique
+
+    // Décocher la case 'toggleHistoryCheckbox' et déclencher l'événement 'change'
+    var toggleHistoryCheckbox = document.getElementById(
+      "toggleHistoryCheckbox"
+    );
+    if (toggleHistoryCheckbox.checked) {
+      toggleHistoryCheckbox.checked = false;
+      toggleHistoryCheckbox.dispatchEvent(new Event("change"));
+    }
+
+    // Maintenant, effacez l'historique après avoir manipulé l'état de la checkbox
+    clearHistory(); // Vide l'historique et ajuste l'affichage
   }
 
   // Ajout d'une nouvelle fonction pour effacer l'historique
@@ -137,7 +148,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function formatLists(text) {
-    // Regex pour détecter les lignes commençant par des tirets
+    if (typeof text !== "string") {
+      // Si ce n'est pas une chaîne, convertissez-le en chaîne ou gérez l'erreur
+      console.error("formatLists expects a string but got:", typeof text);
+      return ""; // Retourner une chaîne vide ou gérer autrement
+    }
     return text.replace(/^-\s(.*)/gm, "<ul><li>$1</li></ul>");
   }
 
@@ -157,7 +172,38 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Met à jour le contenu du conteneur de réponse et gère l'affichage des actions associées.
-  function updateResponseContainer(content) {
+  function updateResponseContainer(data) {
+    // Vérifier si les données sont vides ou non valides avant de continuer
+    if (!data || data === "" || Object.keys(data).length === 0) {
+      console.log("No valid data provided to updateResponseContainer.");
+      return; // Retourne immédiatement si aucune donnée valide n'est fournie
+    }
+    console.log("Received data:", JSON.stringify(data, null, 2)); // Afficher les données de manière lisible
+
+    let content = "";
+
+    // Vérifier le statut et extraire le contenu approprié
+    if (data && data.status === "finished" && data.response !== undefined) {
+      // content = data.response; // Accéder directement à la réponse si la tâche est terminée
+      content = removeJsonArtifacts(data.response); // Nettoyer les artefacts JSON
+    } else if (data && data.status === "failed") {
+      console.error("Job failed:", data.error, data.details);
+      content = "Erreur de traitement : " + data.error;
+    } else if (data && data.status === "processing") {
+      console.log("Job is still processing.");
+      content = "Traitement en cours...";
+    } else {
+      console.error("Unexpected data structure:", data);
+      content = "Réponse inattendue du serveur.";
+    }
+
+    // // Si la réponse est bien une chaîne mais contient des caractères de format JSON, nettoyez-la
+    // if (typeof content === "string") {
+    //   content = removeJsonArtifacts(content);
+    // } else {
+    //   content = JSON.stringify(content); // Convertir l'objet en chaîne si nécessaire
+    // }
+
     var formattedContent = formatLists(content); // Formate les listes si nécessaire
     var responseContainer = document.getElementById("assistant1a-response");
     var questionText = document
@@ -188,6 +234,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Le premier échange est maintenant passé, on actualise l'indicateur
     isFirstExchange = false;
+  }
+
+  function removeJsonArtifacts(text) {
+    if (!text || typeof text !== "string") {
+      return ""; // Retourner une chaîne vide si l'entrée n'est pas valide
+    }
+
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed === "object" && parsed.response) {
+        return parsed.response; // Supposer que 'parsed' est un objet avec une propriété 'response'
+      }
+      return text; // Retourner le texte original si ce n'est pas un objet ou manque 'response'
+    } catch (e) {
+      return text; // Le texte n'est pas du JSON, retourner tel quel
+    }
   }
 
   // Fonction pour ajouter des entrées à l'historique avec classe pour style
@@ -266,6 +328,49 @@ document.addEventListener("DOMContentLoaded", function () {
     setButtonStates();
   }
 
+  // !début vision
+
+  // Fonction pour vérifier l'état d'une tâche en arrière-plan
+  function checkTaskStatus(jobId) {
+    fetch(`https://kokua060424-caea7e92447d.herokuapp.com/results/${jobId}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP status ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Task Status:", data);
+        if (data.status === "finished" || data.status === "failed") {
+          clearInterval(checkInterval);
+          if (data.status === "finished") {
+            updateResponseContainer(data);
+          } else {
+            alert("Task failed: " + data.error);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error checking task status:", error);
+        clearInterval(checkInterval);
+      });
+  }
+
+  // Variable pour stocker l'ID de l'intervalle
+  let checkInterval;
+
+  // Fonction pour commencer à interroger le statut de la tâche
+  function startTaskStatusCheck(jobId) {
+    if (checkInterval !== null) {
+      clearInterval(checkInterval); // S'assure qu'aucun intervalle précédent ne tourne
+    }
+    checkInterval = setInterval(() => {
+      checkTaskStatus(jobId);
+    }, 5000); // Interval peut être ajusté selon les besoins
+  }
+
+  // !fin vision
+
   // Envoie une requête au serveur
   function sendRequest(isVoice = false) {
     if (isRequestPending) return;
@@ -299,26 +404,30 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json();
       })
       .then((data) => {
-        updateResponseContainer(data.response);
-        if (isVoice) {
-          speak(data.response); // Fonction pour activer la synthèse vocale (non fournie ici)
-        }
-        if (!isVoice && fileInput.files.length > 0) {
-          cancelButton.style.display = "none";
+        if (data.job_id) {
+          startTaskStatusCheck(data.job_id); // Démarrez la vérification de l'état avec l'ID de job obtenu
+        } else {
+          updateResponseContainer(data);
+          if (isVoice) {
+            speak(data.response); // Continuez à gérer la synthèse vocale si nécessaire
+          }
         }
       })
       .catch((error) => {
         console.error("Error:", error);
         alert(
           "Une erreur s'est produite lors de la communication avec le serveur. Veuillez réessayer."
-        ); // Notifie l'utilisateur
+        );
         updateResponseContainer("Erreur lors de la requête.");
       })
       .finally(() => {
+        setLoadingState(false);
         if (!isVoice) {
           questionInput.value = ""; // Efface le champ de texte si la requête n'est pas vocale
+          if (fileInput.files.length > 0) {
+            cancelButton.style.display = "none"; // Gère le bouton d'annulation correctement après l'envoi du fichier
+          }
         }
-        setLoadingState(false);
       });
   }
 
@@ -378,11 +487,6 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Speech synthesis has ended."); // Log pour diagnostic
     handleSpeechEnd();
   };
-
-  function removeHtmlTags(text) {
-    var doc = new DOMParser().parseFromString(text, "text/html");
-    return doc.body.textContent || "";
-  }
 
   function removeHtmlTags(text) {
     var doc = new DOMParser().parseFromString(text, "text/html");

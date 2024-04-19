@@ -144,6 +144,7 @@
 #assistant1a-file-upload-status {
   font-family: Arial, sans-serif;
   color: white;
+  font-size: 12px;
 }
 
 #assistant1a-record img {
@@ -294,6 +295,9 @@ fieldset legend {
   font-size: 1em;
   margin-top: 0;
   margin-bottom: 1em;
+}
+#assistant1a-response {
+  display: none;
 }
 
 /* Espacement autour des listes dans le conteneur de réponse */
