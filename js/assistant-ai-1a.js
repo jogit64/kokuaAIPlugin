@@ -356,6 +356,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     checkInterval = setInterval(() => {
       checkTaskStatus(jobId);
+      setLoadingState(false);
     }, 5000); // Interval peut être ajusté selon les besoins
   }
 
@@ -414,7 +415,7 @@ document.addEventListener("DOMContentLoaded", function () {
         updateResponseContainer("Erreur lors de la requête.");
       })
       .finally(() => {
-        setLoadingState(false);
+        // setLoadingState(false);
         if (!isVoice) {
           questionInput.value = ""; // Efface le champ de texte si la requête n'est pas vocale
           if (fileInput.files.length > 0) {
