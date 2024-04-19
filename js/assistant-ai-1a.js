@@ -169,6 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Vérifier le statut et extraire le contenu approprié
     if (data && data.status === "finished" && data.response !== undefined) {
+      setLoadingState(false);
       // content = data.response; // Accéder directement à la réponse si la tâche est terminée
       content = removeJsonArtifacts(data.response); // Nettoyer les artefacts JSON
     } else if (data && data.status === "failed") {
@@ -356,8 +357,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     checkInterval = setInterval(() => {
       checkTaskStatus(jobId);
-      setLoadingState(false);
-    }, 2000); // Interval peut être ajusté selon les besoins
+    }, 2000);
   }
 
   // ! FIN ASYNCHRINE
@@ -387,7 +387,6 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("config_key", selectedConfig);
 
     console.log("Config sélectionnée :", selectedConfig);
-    console.log("FormData avant envoi :", formData.get("config"));
 
     // Envoi de la requête au serveur et gestion des réponses
     fetch("https://kokua060424-caea7e92447d.herokuapp.com/ask", {
@@ -403,6 +402,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .then((data) => {
         if (data.job_id) {
+          console.log("Session ID: ", data.session_id); // Affiche l'ID de session dans la console
           startTaskStatusCheck(data.job_id); // Démarrez la vérification de l'état avec l'ID de job obtenu
         } else {
           updateResponseContainer(data);
