@@ -313,9 +313,16 @@ document.addEventListener("DOMContentLoaded", function () {
   resetButton.addEventListener("click", resetUI);
 
   // Configure l'état de chargement lors des requêtes
-  function setLoadingState(isLoading) {
+  function setLoadingState(isLoading, message = "") {
     isRequestPending = isLoading;
     indicator.style.display = isLoading ? "block" : "none";
+    var loadingMessageElement = document.getElementById("loadingMessage"); // Assure-toi que cet élément existe dans ton HTML
+    if (isLoading && message) {
+      loadingMessageElement.textContent = message;
+      loadingMessageElement.style.display = "block";
+    } else {
+      loadingMessageElement.style.display = "none";
+    }
     setButtonStates();
   }
 
@@ -324,26 +331,29 @@ document.addEventListener("DOMContentLoaded", function () {
   // Fonction pour vérifier l'état d'une tâche en arrière-plan
   function checkTaskStatus(jobId) {
     fetch(`https://kokua060424-caea7e92447d.herokuapp.com/results/${jobId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP status ${response.status}`);
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         console.log("Task Status:", data);
-        if (data.status === "finished" || data.status === "failed") {
-          clearInterval(checkInterval);
+        if (data.status === "processing") {
+          setLoadingState(true, "Traitement en cours. Veuillez patienter...");
+        } else {
           if (data.status === "finished") {
+            setLoadingState(false);
             updateResponseContainer(data);
-          } else {
-            alert("Task failed: " + data.error);
+          } else if (data.status === "failed") {
+            setLoadingState(
+              false,
+              "Le traitement a échoué. Veuillez réessayer ou contacter le support."
+            );
           }
         }
       })
       .catch((error) => {
         console.error("Error checking task status:", error);
-        clearInterval(checkInterval);
+        setLoadingState(
+          false,
+          "Erreur de connexion. Vérifiez votre réseau ou réessayez."
+        );
       });
   }
 
