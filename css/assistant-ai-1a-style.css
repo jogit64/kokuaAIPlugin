@@ -299,6 +299,9 @@ fieldset legend {
 #assistant1a-response {
   display: none;
 }
+#assistant1a-history {
+  display: none;
+}
 
 /* Espacement autour des listes dans le conteneur de réponse */
 #assistant1a-response ul,

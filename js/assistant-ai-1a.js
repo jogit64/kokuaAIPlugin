@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", function () {
   var resetButton = document.getElementById("assistant1a-reset");
   var indicator = document.getElementById("assistant1a-file-upload-status");
   var selectedVoice; // Variable globale pour stocker la voix sélectionnée
+  var responseContainer = document.getElementById("assistant1a-response");
+  var historyContainer = document.getElementById("assistant1a-history");
+  const instructionDiv = document.getElementById("instructionText");
 
   const consignes = {
     salarie: "Copiez et collez l'entretien ou importez un fichier (DOC, DOCX).",
@@ -22,10 +25,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "Utilisez cet espace pour discuter de la rédaction et de la structuration de votre rapport.",
   };
 
-  const instructionDiv = document.getElementById("instructionText");
-
   // Initialisation des variables d'état
-  var isRequestPending = false; // Assurez-vous que cette variable est bien initialisée
+  var isRequestPending = false;
   //var lastAction = null; // Initialisation de lastAction pour une utilisation dans le code
 
   // Gestion de la synthèse vocale et de la reconnaissance vocale
@@ -117,32 +118,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Réinitialise l'interface utilisateur
-  function resetUI() {
-    questionInput.value = "";
-    fileInput.value = "";
-    updateResponseContainer(""); // Met à jour le conteneur de réponse, fonction non fournie
-    cancelButton.style.display = "none";
-    lastAction = null;
-    setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
-    resetSession(); // Appel à resetSession pour réinitialiser la session côté serveur
-
-    // Décocher la case 'toggleHistoryCheckbox' et déclencher l'événement 'change'
-    var toggleHistoryCheckbox = document.getElementById(
-      "toggleHistoryCheckbox"
-    );
-    if (toggleHistoryCheckbox.checked) {
-      toggleHistoryCheckbox.checked = false;
-      toggleHistoryCheckbox.dispatchEvent(new Event("change"));
-    }
-
-    // Maintenant, effacez l'historique après avoir manipulé l'état de la checkbox
-    clearHistory(); // Vide l'historique et ajuste l'affichage
-  }
-
   // Ajout d'une nouvelle fonction pour effacer l'historique
   function clearHistory() {
-    var historyContainer = document.getElementById("assistant1a-history");
+    // var historyContainer = document.getElementById("assistant1a-history");
     historyContainer.innerHTML = ""; // Efface le contenu de l'historique
     historyContainer.style.display = "none";
   }
@@ -157,8 +135,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Gestion de la checkbox pour afficher l'historique
-  var historyContainer = document.getElementById("assistant1a-history");
-  var isFirstExchange = true;
+  // var historyContainer = document.getElementById("assistant1a-history");
+  // var isFirstExchange = true;
   var toggleHistoryCheckbox = document.getElementById("toggleHistoryCheckbox");
 
   // Initialise l'affichage de l'historique en fonction de l'état initial de la case à cocher
@@ -205,12 +183,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // }
 
     var formattedContent = formatLists(content); // Formate les listes si nécessaire
-    var responseContainer = document.getElementById("assistant1a-response");
+    // var responseContainer = document.getElementById("assistant1a-response");
     var questionText = document
       .getElementById("assistant1a-question")
       .value.trim();
     var actionsContainer = document.getElementById("response-actions");
-    var historyContainer = document.getElementById("assistant1a-history");
+    // var historyContainer = document.getElementById("assistant1a-history");
 
     // Affiche la réponse actuelle dans le conteneur de réponse
     if (formattedContent.trim() !== "") {
@@ -222,15 +200,19 @@ document.addEventListener("DOMContentLoaded", function () {
       actionsContainer.style.display = "none";
     }
 
+    // ! AJOUT HISTOTIQUE
     // Ajoute la question à l'historique, sans préfixe dans le texte
-    if (questionText && !isFirstExchange) {
+    // if (questionText && !isFirstExchange) {
+    if (questionText) {
       addHistoryEntry(questionText, "", "question");
     }
 
     // Ajoute la réponse à l'historique, sans préfixe dans le texte
-    if (formattedContent.trim() !== "" && !isFirstExchange) {
+    // if (formattedContent.trim() !== "" && !isFirstExchange) {
+    if (formattedContent.trim() !== "") {
       addHistoryEntry("", formattedContent, "response");
     }
+    // ! FIN AJOUT HISTOTIQUE
 
     // Le premier échange est maintenant passé, on actualise l'indicateur
     isFirstExchange = false;
@@ -328,7 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setButtonStates();
   }
 
-  // !début vision
+  // ! DEBUT ASYNCHRONE
 
   // Fonction pour vérifier l'état d'une tâche en arrière-plan
   function checkTaskStatus(jobId) {
@@ -369,7 +351,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 5000); // Interval peut être ajusté selon les besoins
   }
 
-  // !fin vision
+  // ! FIN ASYNCHRINE
+
+  // todo SEND REQUEST --------------------------
 
   // Envoie une requête au serveur
   function sendRequest(isVoice = false) {
@@ -430,6 +414,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
   }
+
+  // todo FIN SEND REQUEST ----------------------
 
   // Écouteur d'événement sur le bouton 'stop' pour arrêter la synthèse vocale et réinitialiser les entrées
   stopButton.addEventListener("click", function () {
@@ -517,6 +503,7 @@ document.addEventListener("DOMContentLoaded", function () {
     questionInput.value = "";
   }
 
+  // todo ESPACE REINITIALISATION ----------------------
   // Fonction pour réinitialiser la session sur le serveur
   function resetSession() {
     fetch("https://kokua060424-caea7e92447d.herokuapp.com/reset-session", {
@@ -533,6 +520,29 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch((error) => console.error("Erreur:", error)); // Log en cas d'erreur de réseau ou serveur
   }
 
-  // Appel à la fonction pour réinitialiser l'interface utilisateur lors du chargement de la page
+  // Réinitialise l'interface utilisateur
+  function resetUI() {
+    questionInput.value = "";
+    fileInput.value = "";
+    updateResponseContainer(""); // Met à jour le conteneur de réponse, fonction non fournie
+    cancelButton.style.display = "none";
+    lastAction = null;
+    setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
+    resetSession(); // Appel à resetSession pour réinitialiser la session côté serveur
+    responseContainer.style.display = "none";
+    // Décocher la case 'toggleHistoryCheckbox' et déclencher l'événement 'change'
+    var toggleHistoryCheckbox = document.getElementById(
+      "toggleHistoryCheckbox"
+    );
+    if (toggleHistoryCheckbox.checked) {
+      toggleHistoryCheckbox.checked = false;
+      toggleHistoryCheckbox.dispatchEvent(new Event("change"));
+    }
+
+    // Maintenant, effacez l'historique après avoir manipulé l'état de la checkbox
+    clearHistory(); // Vide l'historique et ajuste l'affichage
+  }
+  // todo FIN ESPACE REINITIALISATION ------------------
+
   resetUI();
 });
