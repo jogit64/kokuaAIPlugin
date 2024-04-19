@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ! FIN AJOUT HISTOTIQUE
 
     // Le premier échange est maintenant passé, on actualise l'indicateur
-    isFirstExchange = false;
+    // isFirstExchange = false;
   }
 
   function removeJsonArtifacts(text) {
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // entry.appendChild(document.createElement("br")); // Saut de ligne après le préfixe
     entry.appendChild(message);
 
-    var historyContainer = document.getElementById("assistant1a-history");
+    // var historyContainer = document.getElementById("assistant1a-history");
     historyContainer.appendChild(entry);
     historyContainer.scrollTop = historyContainer.scrollHeight; // Assure le défilement vers le bas
   }
@@ -544,6 +544,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
     resetSession(); // Appel à resetSession pour réinitialiser la session côté serveur
     responseContainer.style.display = "none";
+    clearHistory(); // Vide l'historique et ajuste l'affichage
     // Décocher la case 'toggleHistoryCheckbox' et déclencher l'événement 'change'
     var toggleHistoryCheckbox = document.getElementById(
       "toggleHistoryCheckbox"
@@ -553,8 +554,14 @@ document.addEventListener("DOMContentLoaded", function () {
       toggleHistoryCheckbox.dispatchEvent(new Event("change"));
     }
 
-    // Maintenant, effacez l'historique après avoir manipulé l'état de la checkbox
-    clearHistory(); // Vide l'historique et ajuste l'affichage
+    navigator.clipboard
+      .writeText("")
+      .then(() => console.log("Presse-papiers vidé avec succès"))
+      .catch((err) =>
+        console.error("Erreur lors du vidage du presse-papiers:", err)
+      );
+    copyButton.display = false;
+    saveButton.display = false;
   }
   // todo FIN ESPACE REINITIALISATION ------------------
 
