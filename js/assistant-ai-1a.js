@@ -13,6 +13,11 @@ document.addEventListener("DOMContentLoaded", function () {
   var selectedVoice; // Variable globale pour stocker la voix sélectionnée
   var responseContainer = document.getElementById("assistant1a-response");
   var historyContainer = document.getElementById("assistant1a-history");
+
+  // var questionText = document
+  //   .getElementById("assistant1a-question")
+  //   .value.trim();
+
   const instructionDiv = document.getElementById("instructionText");
 
   const consignes = {
@@ -66,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .dispatchEvent(new Event("change"));
   });
 
+  // ! FONCTION COPY et SAVE ----------------------
   // Fonction pour copier l'historique du chat dans le presse-papiers
   function copyChatHistory(event) {
     event.preventDefault(); // Empêche l'action par défaut du navigateur
@@ -93,6 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   }
+  // ! FIN FONCTION COPY et SAVE ------------------
 
   // Crée un bouton pour annuler le choix du fichier
   var cancelButton = document.createElement("button");
@@ -184,9 +191,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var formattedContent = formatLists(content); // Formate les listes si nécessaire
     // var responseContainer = document.getElementById("assistant1a-response");
-    var questionText = document
-      .getElementById("assistant1a-question")
-      .value.trim();
+    // var questionText = document
+    //   .getElementById("assistant1a-question")
+    //   .value.trim();
+
     var actionsContainer = document.getElementById("response-actions");
     // var historyContainer = document.getElementById("assistant1a-history");
 
@@ -203,9 +211,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // ! AJOUT HISTOTIQUE
     // Ajoute la question à l'historique, sans préfixe dans le texte
     // if (questionText && !isFirstExchange) {
-    if (questionText) {
-      addHistoryEntry(questionText, "", "question");
-    }
+    // if (questionText) {
+    //   addHistoryEntry(questionText, "", "question");
+    // }
 
     // Ajoute la réponse à l'historique, sans préfixe dans le texte
     // if (formattedContent.trim() !== "" && !isFirstExchange) {
@@ -367,6 +375,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     if (questionInput.value.trim().length > 0) {
       formData.append("question", questionInput.value.trim());
+      addHistoryEntry(questionInput.value, "", "question");
     }
 
     // Ajoute la configuration GPT sélectionnée via les boutons radio
