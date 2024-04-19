@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.error("Buttons not found");
   }
 
-  // Gestion des boutons radio pour un aspect interactif
+  // Gestion des boutons radio pour un aspect interactif des consignes
   const radios = document.querySelectorAll('.zone-radio input[type="radio"]');
   radios.forEach((radio) => {
     radio.addEventListener("change", function () {
@@ -357,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function () {
     checkInterval = setInterval(() => {
       checkTaskStatus(jobId);
       setLoadingState(false);
-    }, 5000); // Interval peut être ajusté selon les besoins
+    }, 2000); // Interval peut être ajusté selon les besoins
   }
 
   // ! FIN ASYNCHRINE
@@ -380,10 +380,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Ajoute la configuration GPT sélectionnée via les boutons radio
+
     const selectedConfig = document.querySelector(
       'input[name="config"]:checked'
     ).value;
-    formData.append("config", selectedConfig);
+    formData.append("config_key", selectedConfig);
+
+    console.log("Config sélectionnée :", selectedConfig);
+    console.log("FormData avant envoi :", formData.get("config"));
 
     // Envoi de la requête au serveur et gestion des réponses
     fetch("https://kokua060424-caea7e92447d.herokuapp.com/ask", {
