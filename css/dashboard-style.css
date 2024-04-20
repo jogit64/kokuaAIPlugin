@@ -2,17 +2,17 @@
   background-color: #2e3e50; /* Légèrement plus clair que le fond de la page */
   color: #ffffff;
   font-family: Arial, sans-serif;
-  padding: 10px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-top: 10px;
-  margin-bottom: 20px; /* Ajout d'une marge en bas */
-  border: 1px solid #4e5d6c; /* Liseret fin blanc */
+  /* padding: 10px; */
+  /* border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+  /* margin-top: 10px;
+  margin-bottom: 20px;  */
+  /* border: 1px solid #4e5d6c;  */
+  /* display: none; */
 }
 
-#cost-estimate-container h2 {
-  font-size: 14px; /* Taille de texte ajustée */
-  margin-bottom: 10px; /* Espacement après le titre */
+#cost-estimate-fieldset {
+  display: none;
 }
 
 .details-container {

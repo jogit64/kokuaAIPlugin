@@ -113,15 +113,19 @@ document.addEventListener("DOMContentLoaded", function () {
   cancelButton.addEventListener("click", function () {
     fileInput.value = ""; // Réinitialise le choix du fichier
     this.style.display = "none"; // Cache le bouton d'annulation
-    setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
+    document.getElementById("cost-estimate-fieldset").style.display = "none"; // Cache le `fieldset`
+    setButtonStates(); // Met à jour l'état des boutons
   });
 
   // Gestion de la sélection de fichier
   fileInput.addEventListener("change", function () {
     if (this.files.length > 0) {
       cancelButton.style.display = "block";
+      document.getElementById("cost-estimate-fieldset").style.display = "block"; // Affiche le `fieldset`
       lastAction = "file";
-      setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
+      setButtonStates(); // Met à jour l'état des boutons
+    } else {
+      document.getElementById("cost-estimate-fieldset").style.display = "none"; // Cache le `fieldset` si aucun fichier n'est sélectionné
     }
   });
 

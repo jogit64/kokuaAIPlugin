@@ -59,13 +59,6 @@ function assistant1a_shortcode()
 <div class="widget">
 
 
-    <div id="zone-session">
-        <fieldset>
-            <legend>Session utilisateur</legend>
-            <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
-        </fieldset>
-    </div>
-
     <form id="assistant1a-form" enctype="multipart/form-data" method="post">
 
         <div class="zone-containRadio">
@@ -92,32 +85,37 @@ function assistant1a_shortcode()
                     <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx,.pdf,.ppt,.pptx,.txt">
                     <button type="button" id="assistant1a-file-submit" class="custom-button">Envoyer le fichier</button>
                 </div>
+                <!-- Insertion du fieldset de l'estimation des coûts ici pour un affichage en ligne -->
+                <fieldset id="cost-estimate-fieldset">
+                    <legend>Estimation des coûts</legend>
+                    <div id="cost-estimate-container">
+                        <div class="details-container">
+                            <div class="token-details">
+                                <h3>Tokens</h3>
+                                <p>Input: <span id="token-input">0</span></p>
+                                <p>Output: <span id="token-output">0</span></p>
+                                <p>Total: <span id="token-total">0</span></p>
+                            </div>
+                            <div class="cost-details">
+                                <h3>Coût</h3>
+                                <p><span id="cost-estimated">0.00</span></p>
+                            </div>
+                            <div class="quality-details">
+                                <h3>Qualité</h3>
+                                <p><span id="quality">N/A</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
             </fieldset>
 
 
             <fieldset>
-                <legend>Estimation des coûts</legend>
-                <div id="cost-estimate-container">
-                    <div class="details-container">
-                        <div class="token-details">
-                            <h3>Tokens</h3>
-                            <p>Input: <span id="token-input">0</span></p>
-                            <p>Output (est.): <span id="token-output">0</span></p>
-                            <p>Total: <span id="token-total">0</span></p>
-                        </div>
-                        <div class="cost-details">
-                            <h3>Coût</h3>
-                            <p>Estimé: €<span id="cost-estimated">0.00</span></p>
-                        </div>
-                        <div class="quality-details">
-                            <h3>Qualité</h3>
-                            <p><span id="quality">N/A</span></p>
-                        </div>
-                    </div>
-                </div>
+                <legend>Session utilisateur</legend>
+                <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
             </fieldset>
-
         </div>
+
 
         <div class="zone-scrib">
             <!-- <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."> -->
@@ -132,6 +130,12 @@ function assistant1a_shortcode()
                 <img src="<?php echo plugins_url('assets/sortie.png', __FILE__); ?>" alt="Demander">
             </button>
         </div>
+        <!-- <div id="zone-session">
+                <fieldset>
+                    <legend>Session utilisateur</legend>
+                    <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
+                </fieldset>
+            </div> -->
 
         <div class="charger">
             <div id="loadingMessage" style="display: none;"></div>
@@ -141,6 +145,7 @@ function assistant1a_shortcode()
         </div>
 
         <div id="assistant1a-response"></div>
+
         <div id="response-actions" style="display:none;">
             <!-- Actions cachées par défaut -->
             <button id="copyButton">Copier l'échange</button>

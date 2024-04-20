@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const quality = evaluateQuality(totalTokens, maxTokens);
       updateDisplay(inputTokens, outputTokens, totalTokens, costInEUR, quality);
     };
+    reader.onerror = function (e) {
+      console.error("Erreur de lecture du fichier : ", e.target.error.message);
+    };
     reader.readAsText(file);
   }
 
