@@ -56,102 +56,108 @@ function assistant1a_shortcode()
     ob_start(); // Commence la capture de sortie
     // HTML du formulaire
 ?>
-    <div class="widget">
+<div class="widget">
 
-        <div id="cost-estimate-container">
-            <h2>Estimation des Coûts et Qualité du Traitement</h2>
-            <div class="details-container">
-                <div class="token-details">
-                    <h3>Tokens</h3>
-                    <p>Input: <span id="token-input">0</span></p>
-                    <p>Output (est.): <span id="token-output">0</span></p>
-                    <p>Total: <span id="token-total">0</span></p>
+
+    <div id="zone-session">
+        <fieldset>
+            <legend>Session utilisateur</legend>
+            <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
+        </fieldset>
+    </div>
+
+    <form id="assistant1a-form" enctype="multipart/form-data" method="post">
+
+        <div class="zone-containRadio">
+
+            <fieldset>
+                <legend>Usages</legend>
+                <div class="zone-radio">
+                    <label><input type="radio" name="config" value="salarie" checked> Entretien salarié</label><br>
+                    <label><input type="radio" name="config" value="direction"> Entretien direction</label><br>
+                    <label><input type="radio" name="config" value="document"> Analyse documentaire</label><br>
+                    <label><input type="radio" name="config" value="mp3"> Transcription audio</label><br>
+                    <label><input type="radio" name="config" value="discussion"> Rédaction</label><br>
+
                 </div>
-                <div class="cost-details">
-                    <h3>Coût</h3>
-                    <p>Estimé: €<span id="cost-estimated">0.00</span></p>
+                <div id="instructionText"></div>
+            </fieldset>
+
+        </div>
+        <div class="zone-ctrlFIcSess">
+
+            <fieldset>
+                <legend>Gestion du fichier</legend>
+                <div id="assistant1a-file-section">
+                    <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx,.pdf,.ppt,.pptx,.txt">
+                    <button type="button" id="assistant1a-file-submit" class="custom-button">Envoyer le fichier</button>
                 </div>
-                <div class="quality-details">
-                    <h3>Qualité</h3>
-                    <p><span id="quality">N/A</span></p>
+            </fieldset>
+
+
+            <fieldset>
+                <legend>Estimation des coûts</legend>
+                <div id="cost-estimate-container">
+                    <div class="details-container">
+                        <div class="token-details">
+                            <h3>Tokens</h3>
+                            <p>Input: <span id="token-input">0</span></p>
+                            <p>Output (est.): <span id="token-output">0</span></p>
+                            <p>Total: <span id="token-total">0</span></p>
+                        </div>
+                        <div class="cost-details">
+                            <h3>Coût</h3>
+                            <p>Estimé: €<span id="cost-estimated">0.00</span></p>
+                        </div>
+                        <div class="quality-details">
+                            <h3>Qualité</h3>
+                            <p><span id="quality">N/A</span></p>
+                        </div>
+                    </div>
                 </div>
+            </fieldset>
+
+        </div>
+
+        <div class="zone-scrib">
+            <!-- <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."> -->
+            <button type="button" id="assistant1a-record" class="custom-button">
+                <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
+            </button>
+            <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
+            <textarea id="assistant1a-question" name="question" placeholder="Posez votre question ici..."></textarea>
+
+            <!-- <button type="button" id="assistant1a-submit" class="custom-button">Demander</button> -->
+            <button type="button" id="assistant1a-submit" class="custom-button">
+                <img src="<?php echo plugins_url('assets/sortie.png', __FILE__); ?>" alt="Demander">
+            </button>
+        </div>
+
+        <div class="charger">
+            <div id="loadingMessage" style="display: none;"></div>
+            <div id="assistant1a-file-upload-status" style="display:none;">
+                <div class="loader"></div>
             </div>
         </div>
 
+        <div id="assistant1a-response"></div>
+        <div id="response-actions" style="display:none;">
+            <!-- Actions cachées par défaut -->
+            <button id="copyButton">Copier l'échange</button>
+            <button id="saveButton">Sauvegarder l'échange</button>
 
-        <div id="instructionText"></div>
+            <label>
+                <input type="checkbox" id="toggleHistoryCheckbox" unchecked>
+                Afficher l'historique
+            </label>
 
-        <form id="assistant1a-form" enctype="multipart/form-data" method="post">
-
-            <div class="zone-containRadio">
-                <fieldset>
-                    <legend>Usages</legend>
-                    <div class="zone-radio">
-                        <label><input type="radio" name="config" value="salarie" checked> Entretien salarié</label><br>
-                        <label><input type="radio" name="config" value="direction"> Entretien direction</label><br>
-                        <label><input type="radio" name="config" value="document"> Analyse documentaire</label><br>
-                        <label><input type="radio" name="config" value="mp3"> Transcription audio</label><br>
-                        <label><input type="radio" name="config" value="discussion"> Rédaction</label><br>
-                    </div>
-                </fieldset>
-            </div>
-            <div class="zone-ctrlFIcSess">
-
-                <fieldset>
-                    <legend>Gestion du fichier</legend>
-                    <div id="assistant1a-file-section">
-                        <input type="file" id="assistant1a-file" name="file" accept=".doc,.docx,.pdf,.ppt,.pptx,.txt">
-                        <button type="button" id="assistant1a-file-submit" class="custom-button">Envoyer le fichier</button>
-                    </div>
-                </fieldset>
+        </div>
 
 
-                <fieldset>
-                    <legend>Session utilisateur</legend>
-                    <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
-                </fieldset>
+    </form>
 
-            </div>
-
-            <div class="zone-scrib">
-                <!-- <input type="text" id="assistant1a-question" name="question" placeholder="Posez votre question ici..."> -->
-                <button type="button" id="assistant1a-record" class="custom-button">
-                    <img src="<?php echo plugins_url('assets/micro.png', __FILE__); ?>" alt="Micro">
-                </button>
-                <button type="button" id="assistant1a-stop" class="custom-button" style="display:none;">Arrêter</button>
-                <textarea id="assistant1a-question" name="question" placeholder="Posez votre question ici..."></textarea>
-
-                <!-- <button type="button" id="assistant1a-submit" class="custom-button">Demander</button> -->
-                <button type="button" id="assistant1a-submit" class="custom-button">
-                    <img src="<?php echo plugins_url('assets/sortie.png', __FILE__); ?>" alt="Demander">
-                </button>
-            </div>
-
-            <div class="charger">
-                <div id="loadingMessage" style="display: none;"></div>
-                <div id="assistant1a-file-upload-status" style="display:none;">
-                    <div class="loader"></div>
-                </div>
-            </div>
-
-            <div id="assistant1a-response"></div>
-            <div id="response-actions" style="display:none;">
-                <!-- Actions cachées par défaut -->
-                <button id="copyButton">Copier l'échange</button>
-                <button id="saveButton">Sauvegarder l'échange</button>
-
-                <label>
-                    <input type="checkbox" id="toggleHistoryCheckbox" unchecked>
-                    Afficher l'historique
-                </label>
-
-            </div>
-
-
-        </form>
-
-        <div id="assistant1a-history"></div>
-    </div>
+    <div id="assistant1a-history"></div>
+</div>
 
 
 <?php

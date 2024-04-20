@@ -336,16 +336,16 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Task Status:", data);
         if (data.status === "processing") {
           setLoadingState(true, "Traitement en cours. Veuillez patienter...");
-        } else {
-          if (data.status === "finished") {
-            setLoadingState(false);
-            updateResponseContainer(data);
-          } else if (data.status === "failed") {
-            setLoadingState(
-              false,
-              "Le traitement a échoué. Veuillez réessayer ou contacter le support."
-            );
-          }
+        } else if (data.status === "finished") {
+          setLoadingState(false);
+          updateResponseContainer(data);
+          clearInterval(checkInterval); // Arrête l'intervalle lorsque le travail est terminé
+        } else if (data.status === "failed") {
+          setLoadingState(
+            false,
+            "Le traitement a échoué. Veuillez réessayer ou contacter le support."
+          );
+          clearInterval(checkInterval); // Arrête l'intervalle si le travail a échoué
         }
       })
       .catch((error) => {
@@ -357,12 +357,9 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  // Variable pour stocker l'ID de l'intervalle
-  let checkInterval;
-
   // Fonction pour commencer à interroger le statut de la tâche
   function startTaskStatusCheck(jobId) {
-    if (checkInterval !== null) {
+    if (checkInterval) {
       clearInterval(checkInterval); // S'assure qu'aucun intervalle précédent ne tourne
     }
     checkInterval = setInterval(() => {
@@ -370,6 +367,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 2000);
   }
 
+  // Variable pour stocker l'ID de l'intervalle
+  let checkInterval = null;
   // ! FIN ASYNCHRINE
 
   // todo SEND REQUEST --------------------------

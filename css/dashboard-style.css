@@ -28,13 +28,21 @@
   padding: 5px; /* Padding réduit pour un design plus discret */
   border-right: 1px solid #4e5d6c; /* Séparation subtile entre les colonnes */
   box-sizing: border-box;
-  flex-wrap: nowrap;
 }
 
 .token-details:last-child,
 .cost-details:last-child,
 .quality-details:last-child {
   border-right: none;
+}
+
+.token-details h3,
+.cost-details h3,
+.quality-details h3 {
+  font-size: 14px; /* Taille de texte ajustée pour les sous-titres */
+  margin-bottom: 5px; /* Moins d'espace sous les sous-titres */
+  font-weight: bold;
+  /* color: red; */
 }
 
 #cost-estimate-container h3 {

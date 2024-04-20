@@ -12,6 +12,8 @@
   font-weight: 100;
   text-align: center;
   font-size: 12px;
+  margin-top: 10px;
+  display: block;
 }
 
 #assistant1a-form {
@@ -19,7 +21,7 @@
   flex-grow: 1;
   flex-direction: column;
   align-items: center;
-  background-color: #2b3e50;
+  /* background-color: #2b3e50; */
 }
 .zone-radio,
 .zone-checkbox,
@@ -59,6 +61,19 @@
 .zone-containRadio {
   display: flex;
   flex-direction: row;
+  /* background-color: yellow; */
+
+  padding-right: 10px;
+  padding-left: 10px;
+  width: 100%;
+}
+
+#zone-session {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
+  /* background-color: #0075ff; */
   /* background-color: yellow; */
 
   padding-right: 10px;
@@ -166,7 +181,8 @@
 }
 
 /* Style de base pour tous les boutons, états désactivés et actifs spécifiques */
-#assistant1a-form button.custom-button {
+#assistant1a-form button.custom-button,
+#zone-session button.custom-button {
   /* background-color: #4e5d6c; */
   background-color: #60686f;
   color: white;
@@ -233,7 +249,7 @@
 }
 
 fieldset {
-  margin: auto; /* Centre le fieldset si moins large que max-width */
+  /* margin: auto;  */
   margin-left: 2px;
   border: 1px solid #4e5d6c;
   padding: 10px;
@@ -259,7 +275,6 @@ fieldset legend {
 
 .loader {
   border: 6px solid #f3f3f3;
-
   border-top: 6px solid #3498db;
   border-radius: 50%;
   width: 60px;
