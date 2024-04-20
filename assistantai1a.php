@@ -35,9 +35,13 @@ class Assistant1a_Widget extends WP_Widget
 function assistant1a_enqueue_styles()
 {
     wp_enqueue_style('assistant1a-style', plugins_url('css/assistant-ai-1a-style.css', __FILE__));
+    wp_enqueue_style('dashboard-style', plugins_url('css/dashboard-style.css', __FILE__)); // Charger le nouveau fichier CSS pour le dashboard
     wp_enqueue_script('assistant1a-script', plugins_url('js/assistant-ai-1a.js', __FILE__), array('jquery'), false, true);
+    wp_enqueue_script('dashboard-script', plugins_url('js/dashboard.js', __FILE__), array('jquery'), false, true); // Assurez-vous que ce script est bien créé et fonctionnel
 }
 add_action('wp_enqueue_scripts', 'assistant1a_enqueue_styles');
+
+
 
 // Enregistre le widget.
 function register_assistant1a_widget()
@@ -53,6 +57,27 @@ function assistant1a_shortcode()
     // HTML du formulaire
 ?>
     <div class="widget">
+
+        <div id="cost-estimate-container">
+            <h2>Estimation des Coûts et Qualité du Traitement</h2>
+            <div class="details-container">
+                <div class="token-details">
+                    <h3>Tokens</h3>
+                    <p>Input: <span id="token-input">0</span></p>
+                    <p>Output (est.): <span id="token-output">0</span></p>
+                    <p>Total: <span id="token-total">0</span></p>
+                </div>
+                <div class="cost-details">
+                    <h3>Coût</h3>
+                    <p>Estimé: €<span id="cost-estimated">0.00</span></p>
+                </div>
+                <div class="quality-details">
+                    <h3>Qualité</h3>
+                    <p><span id="quality">N/A</span></p>
+                </div>
+            </div>
+        </div>
+
 
         <div id="instructionText"></div>
 

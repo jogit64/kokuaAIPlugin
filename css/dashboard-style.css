@@ -1,0 +1,48 @@
+#cost-estimate-container {
+  background-color: #2e3e50; /* Légèrement plus clair que le fond de la page */
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  margin-bottom: 20px; /* Ajout d'une marge en bas */
+  border: 1px solid #4e5d6c; /* Liseret fin blanc */
+}
+
+#cost-estimate-container h2 {
+  font-size: 14px; /* Taille de texte ajustée */
+  margin-bottom: 10px; /* Espacement après le titre */
+}
+
+.details-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.token-details,
+.cost-details,
+.quality-details {
+  flex: 1;
+  padding: 5px; /* Padding réduit pour un design plus discret */
+  border-right: 1px solid #4e5d6c; /* Séparation subtile entre les colonnes */
+  box-sizing: border-box;
+  flex-wrap: nowrap;
+}
+
+.token-details:last-child,
+.cost-details:last-child,
+.quality-details:last-child {
+  border-right: none;
+}
+
+#cost-estimate-container h3 {
+  font-size: 12px; /* Taille de texte ajustée pour les sous-titres */
+  margin-bottom: 5px; /* Moins d'espace sous les sous-titres */
+}
+
+#cost-estimate-container p {
+  font-size: 12px; /* Uniformisation de la taille de texte */
+  margin: 2px 0; /* Réduction des marges pour un design plus compact */
+}

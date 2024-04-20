@@ -364,3 +364,9 @@ fieldset legend {
     opacity: 1;
   }
 }
+
+#cost-estimate {
+  color: white;
+  text-align: center;
+  font-size: 12px;
+}
