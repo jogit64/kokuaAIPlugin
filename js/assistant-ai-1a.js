@@ -48,55 +48,99 @@ document.addEventListener("DOMContentLoaded", function () {
   var saveButton = document.getElementById("saveButton");
 
   // ! FONCTION COPY et SAVE ----------------------
+  function adjustStyleForPDF(element) {
+    const originalStyle = element.getAttribute("style");
+    element.style.color = "black"; // Couleur de base pour tout le texte
+    element.style.backgroundColor = "white"; // Supprime le fond sombre
+
+    // Modification spécifique pour les titres ou autres éléments
+    const titles = element.querySelectorAll("h1, h2, h3, h4, h5, h6"); // Sélection de tous les titres
+    titles.forEach((title) => {
+      title.style.color = "black"; // Modifie la couleur des titres en noir
+    });
+
+    // Sauvegarder et retourner les styles originaux si nécessaire
+    return {
+      elementStyle: originalStyle,
+      titleStyles: Array.from(titles).map((title) => title.style.color),
+    };
+  }
+
+  function restoreOriginalStyle(element, styles) {
+    element.setAttribute("style", styles.elementStyle);
+    const titles = element.querySelectorAll("h1, h2, h3, h4, h5, h6");
+    titles.forEach((title, index) => {
+      title.style.color = styles.titleStyles[index]; // Restaure les couleurs originales des titres
+    });
+  }
+
   // Fonction pour copier l'historique du chat dans le presse-papiers
   function copyChatHistory(event) {
     event.preventDefault(); // Empêche l'action par défaut du navigateur
-    const responseText = document.getElementById(
-      "assistant1a-response"
-    ).innerText;
+    const responseElement = document.getElementById("assistant1a-response");
+
+    // Utilisation de innerHTML pour obtenir le contenu HTML
+    const responseHtml = responseElement.innerHTML;
+
+    // Copier le contenu formaté dans le presse-papiers
     navigator.clipboard
-      .writeText(responseText)
-      .then(() => alert("L'échange a été copié dans le presse-papiers"))
-      .catch((err) => console.error("Erreur lors de la copie:", err));
+      .write([
+        new ClipboardItem({
+          "text/html": new Blob([responseHtml], { type: "text/html" }),
+          "text/plain": new Blob([responseElement.innerText], {
+            type: "text/plain",
+          }),
+        }),
+      ])
+      .then(() => {
+        alert(
+          "L'échange a été copié dans le presse-papiers avec le formatage."
+        );
+      })
+      .catch((err) => {
+        console.error("Erreur lors de la copie:", err);
+      });
   }
 
   // Fonction pour sauvegarder l'historique du chat sur le disque local
   function saveChatHistory(event) {
     event.preventDefault();
 
-    // Utilisation de jsPDF pour créer un PDF
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const element = document.getElementById("assistant1a-response");
+    if (!element) {
+      console.error("Élément non trouvé");
+      return;
+    }
 
-    // Option 1: Ajouter du texte simple
-    const responseText = document.getElementById(
-      "assistant1a-response"
-    ).innerText;
-    doc.text(responseText, 10, 10); // Positionne le texte à 10mm du haut et du côté gauche
+    // Ajustement du style pour le PDF
+    const originalStyles = adjustStyleForPDF(element);
 
-    // Option 2: Utilisation de html2canvas pour capturer du HTML (si vous avez des styles importants)
-    // html2canvas(document.getElementById("assistant1a-response")).then(canvas => {
-    //     const imgData = canvas.toDataURL('image/png');
-    //     const imgWidth = 210;  // largeur d'une page A4 en mm
-    //     const pageHeight = 295;  // hauteur d'une page A4 en mm
-    //     const imgHeight = canvas.height * imgWidth / canvas.width;
-    //     let heightLeft = imgHeight;
+    html2canvas(element, {
+      backgroundColor: null, // Assure que le fond est transparent
+      logging: true,
+      scale: 2, // Améliore la qualité de l'image capturée
+    })
+      .then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+        const jsPDF = window.jspdf.jsPDF;
+        const doc = new jsPDF();
+        const imgWidth = 210; // Largeur d'une page A4 en mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    //     let position = 0;
+        doc.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        doc.save("chat-history.pdf");
 
-    //     doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    //     heightLeft -= pageHeight;
-
-    //     while (heightLeft >= 0) {
-    //         position = heightLeft - imgHeight;
-    //         doc.addPage();
-    //         doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    //         heightLeft -= pageHeight;
-    //     }
-    // });
-
-    // Enregistrement du PDF
-    doc.save("chat-history.pdf");
+        // Restauration du style original après la capture
+        restoreOriginalStyle(element, originalStyles);
+      })
+      .catch((err) => {
+        console.error(
+          "Erreur lors de la capture ou de la sauvegarde du PDF:",
+          err
+        );
+        // Restauration du style en cas d'erreur également
+        restoreOriginalStyle(element, originalStyles);
+      });
   }
 
   // ! FIN FONCTION COPY et SAVE ------------------
