@@ -346,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         console.log("Task Status:", data);
         if (data.status === "processing") {
-          setLoadingState(true, "Traitement en cours");
+          setLoadingState(true, "- TRAITEMENT EN COURS -");
         } else if (data.status === "finished") {
           setLoadingState(false);
           updateResponseContainer(data);

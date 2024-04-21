@@ -412,6 +412,7 @@ fieldset legend {
 #staticMessage {
   color: #cccccc;
   text-align: center;
+  font-style: italic;
   font-size: 12px;
   margin-bottom: 15px; /* Ajustez selon l'espacement désiré */
   display: none; /* Caché par défaut, affiché uniquement lors de l'activation du loader */
@@ -420,7 +421,7 @@ fieldset legend {
 .loading-message {
   color: white;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   display: none;
   animation: blinkingText 1.2s infinite;
   margin-bottom: 5px;
