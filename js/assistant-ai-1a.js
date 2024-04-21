@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var responseContainer = document.getElementById("assistant1a-response");
   var historyContainer = document.getElementById("assistant1a-history");
   var costEstimate = document.getElementById("cost-estimate-fieldset");
+  var actionsContainer = document.getElementById("response-actions");
 
   // var questionText = document
   //   .getElementById("assistant1a-question")
@@ -46,32 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var copyButton = document.getElementById("copyButton");
   var saveButton = document.getElementById("saveButton");
 
-  if (copyButton && saveButton) {
-    copyButton.addEventListener("click", copyChatHistory);
-    saveButton.addEventListener("click", saveChatHistory);
-  } else {
-    console.error("Buttons not found");
-  }
-
-  // Gestion des boutons radio pour un aspect interactif des consignes
-  const radios = document.querySelectorAll('.zone-radio input[type="radio"]');
-  radios.forEach((radio) => {
-    radio.addEventListener("change", function () {
-      radios.forEach((r) => r.parentNode.classList.remove("active"));
-      if (radio.checked) {
-        radio.parentNode.classList.add("active");
-        instructionDiv.textContent = consignes[radio.value];
-      }
-    });
-    if (radio.checked) {
-      radio.parentNode.classList.add("active");
-    }
-    // Assurez-vous de déclencher l'événement 'change' après que tous les écouteurs sont en place
-    document
-      .querySelector('.zone-radio input[type="radio"]:checked')
-      .dispatchEvent(new Event("change"));
-  });
-
   // ! FONCTION COPY et SAVE ----------------------
   // Fonction pour copier l'historique du chat dans le presse-papiers
   function copyChatHistory(event) {
@@ -88,18 +63,42 @@ document.addEventListener("DOMContentLoaded", function () {
   // Fonction pour sauvegarder l'historique du chat sur le disque local
   function saveChatHistory(event) {
     event.preventDefault();
+
+    // Utilisation de jsPDF pour créer un PDF
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Option 1: Ajouter du texte simple
     const responseText = document.getElementById(
       "assistant1a-response"
     ).innerText;
-    const blob = new Blob([responseText], { type: "text/plain" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "response.txt";
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    doc.text(responseText, 10, 10); // Positionne le texte à 10mm du haut et du côté gauche
+
+    // Option 2: Utilisation de html2canvas pour capturer du HTML (si vous avez des styles importants)
+    // html2canvas(document.getElementById("assistant1a-response")).then(canvas => {
+    //     const imgData = canvas.toDataURL('image/png');
+    //     const imgWidth = 210;  // largeur d'une page A4 en mm
+    //     const pageHeight = 295;  // hauteur d'une page A4 en mm
+    //     const imgHeight = canvas.height * imgWidth / canvas.width;
+    //     let heightLeft = imgHeight;
+
+    //     let position = 0;
+
+    //     doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    //     heightLeft -= pageHeight;
+
+    //     while (heightLeft >= 0) {
+    //         position = heightLeft - imgHeight;
+    //         doc.addPage();
+    //         doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    //         heightLeft -= pageHeight;
+    //     }
+    // });
+
+    // Enregistrement du PDF
+    doc.save("chat-history.pdf");
   }
+
   // ! FIN FONCTION COPY et SAVE ------------------
 
   // Crée un bouton pour annuler le choix du fichier
@@ -203,7 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //   .getElementById("assistant1a-question")
     //   .value.trim();
 
-    var actionsContainer = document.getElementById("response-actions");
+    // var actionsContainer = document.getElementById("response-actions");
     // var historyContainer = document.getElementById("assistant1a-history");
 
     // Affiche la réponse actuelle dans le conteneur de réponse
@@ -211,6 +210,8 @@ document.addEventListener("DOMContentLoaded", function () {
       responseContainer.innerHTML = formattedContent;
       responseContainer.style.display = "block";
       actionsContainer.style.display = "block";
+      addHistoryEntry("", formattedContent, "response");
+      setButtonStates();
     } else {
       responseContainer.style.display = "none";
       actionsContainer.style.display = "none";
@@ -225,9 +226,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Ajoute la réponse à l'historique, sans préfixe dans le texte
     // if (formattedContent.trim() !== "" && !isFirstExchange) {
-    if (formattedContent.trim() !== "") {
-      addHistoryEntry("", formattedContent, "response");
-    }
+    // if (formattedContent.trim() !== "") {
+    //   addHistoryEntry("", formattedContent, "response");
+    // }
     // ! FIN AJOUT HISTOTIQUE
 
     // Le premier échange est maintenant passé, on actualise l'indicateur
@@ -305,6 +306,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "assistant1a-response"
     ).innerText;
     if (responseText.trim().length > 0) {
+      console.log("passé par là");
+      console.log("responseText est :", responseText);
       copyButton.disabled = false;
       saveButton.disabled = false;
     }
@@ -556,17 +559,22 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch((error) => console.error("Erreur:", error)); // Log en cas d'erreur de réseau ou serveur
   }
 
+  // todo FIN ESPACE REINITIALISATION ------------------
+
   // Réinitialise l'interface utilisateur
   function resetUI() {
     questionInput.value = "";
     fileInput.value = "";
     updateResponseContainer(""); // Met à jour le conteneur de réponse, fonction non fournie
     cancelButton.style.display = "none";
+    actionsContainer.style.display = "none";
+
     lastAction = null;
     setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
     resetSession(); // Appel à resetSession pour réinitialiser la session côté serveur
     responseContainer.style.display = "none";
     clearHistory(); // Vide l'historique et ajuste l'affichage
+
     // Décocher la case 'toggleHistoryCheckbox' et déclencher l'événement 'change'
     var toggleHistoryCheckbox = document.getElementById(
       "toggleHistoryCheckbox"
@@ -585,7 +593,32 @@ document.addEventListener("DOMContentLoaded", function () {
     copyButton.display = false;
     saveButton.display = false;
   }
-  // todo FIN ESPACE REINITIALISATION ------------------
+
+  if (copyButton && saveButton) {
+    copyButton.addEventListener("click", copyChatHistory);
+    saveButton.addEventListener("click", saveChatHistory);
+  } else {
+    console.error("Buttons not found");
+  }
+
+  // Gestion des boutons radio pour un aspect interactif des consignes
+  const radios = document.querySelectorAll('.zone-radio input[type="radio"]');
+  radios.forEach((radio) => {
+    radio.addEventListener("change", function () {
+      radios.forEach((r) => r.parentNode.classList.remove("active"));
+      if (radio.checked) {
+        radio.parentNode.classList.add("active");
+        instructionDiv.textContent = consignes[radio.value];
+      }
+    });
+    if (radio.checked) {
+      radio.parentNode.classList.add("active");
+    }
+    // Assurez-vous de déclencher l'événement 'change' après que tous les écouteurs sont en place
+    document
+      .querySelector('.zone-radio input[type="radio"]:checked')
+      .dispatchEvent(new Event("change"));
+  });
 
   resetUI();
 });

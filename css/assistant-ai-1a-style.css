@@ -151,8 +151,6 @@
   opacity: 1; /* Assurez-vous que la couleur est bien visible */
 }
 
-#assistant1a-history,
-#assistant1a-response,
 #assistant1a-file-upload-status {
   font-family: Arial, sans-serif;
   color: white;
@@ -226,7 +224,7 @@
   cursor: pointer;
   font-size: 12px;
   margin-top: 30px;
-  /* transition: background-color 0.3s, opacity 0.3s; */
+  transition: background-color 0.3s, opacity 0.3s;
 }
 #response-actions label {
   /* background-color: #4e5d6c; */
@@ -268,10 +266,15 @@
   background-color: #4e5d6c; /* Couleur de fond légère pour les conteneurs */
   border: 1px solid #ccc;
   box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur calculée */
+
+  font-family: Arial, sans-serif;
+  color: white;
+  font-size: 12px;
 }
 
 #assistant1a-history {
   height: 300px; /* Fixe la hauteur pour l'histoire */
+  display: none;
 }
 
 fieldset {
@@ -345,13 +348,17 @@ fieldset legend {
 
 /* Style des titres uniquement dans le conteneur de réponse du widget */
 #assistant1a-response h1,
+#assistant1a-history h1,
 #assistant1a-response h2,
+#assistant1a-history h2,
+#assistant1a-history h3,
 #assistant1a-response h3 {
   margin-top: 0.8em;
   margin-bottom: 0.4em;
   color: #eaff00; /* Exemple de couleur */
   font-size: 1.2em; /* Taille de police plus petite pour une harmonie avec le texte */
 }
+#assistant1a-history h4,
 #assistant1a-response h4 {
   margin-top: 0.8em;
   margin-bottom: 0.4em;
@@ -360,6 +367,7 @@ fieldset legend {
 }
 
 /* Style des paragraphes dans le conteneur de réponse */
+#assistant1a-history p,
 #assistant1a-response p {
   font-size: 1em;
   margin-top: 0;
@@ -368,12 +376,11 @@ fieldset legend {
 #assistant1a-response {
   display: none;
 }
-#assistant1a-history {
-  display: none;
-}
 
 /* Espacement autour des listes dans le conteneur de réponse */
+#assistant1a-history ul,
 #assistant1a-response ul,
+#assistant1a-history ol,
 #assistant1a-response ol {
   margin-top: 0.5em;
   margin-bottom: 1.5em;
@@ -381,11 +388,17 @@ fieldset legend {
 }
 
 /* Espacement après une liste si suivie par un titre dans le même conteneur */
+#assistant1a-history ul + h1,
 #assistant1a-response ul + h1,
+#assistant1a-history ul + h2,
 #assistant1a-response ul + h2,
+#assistant1a-history ul + h3,
 #assistant1a-response ul + h3,
+#assistant1a-history ol + h1,
 #assistant1a-response ol + h1,
+#assistant1a-history ol + h2,
 #assistant1a-response ol + h2,
+#assistant1a-history ol + h3,
 #assistant1a-response ol + h3 {
   margin-top: 1.5em;
 }
