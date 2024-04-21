@@ -25,6 +25,7 @@
 }
 .zone-radio,
 .zone-checkbox,
+#assistant1a-session-section,
 #assistant1a-file-section {
   display: flex;
   flex-wrap: wrap;
@@ -32,6 +33,7 @@
   background-color: #2b3e4f;
   color: rgb(189, 189, 189);
   font-size: 12px;
+  /* height: 40px; */
 }
 
 /* #assistant1a-file-section {
@@ -69,10 +71,10 @@
 }
 
 #zone-session {
-  display: flex;
+  /* display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  align-items: flex-end;
+  align-items: flex-end; */
   /* background-color: #0075ff; */
   /* background-color: yellow; */
 
@@ -140,22 +142,6 @@
   font-size: 12px;
 }
 
-#assistant1a-file-submit,
-#assistant1a-cancel-file,
-#assistant1a-file,
-#assistant1a-reset {
-  font-size: 12px;
-  margin-right: 8px;
-  margin-top: 8px;
-  background-color: yellow;
-}
-
-#assistant1a-file {
-  padding: 15px 10px;
-  color: #ffffff;
-  background-color: #485563;
-}
-
 #assistant1a-history,
 #assistant1a-response,
 #assistant1a-file-upload-status {
@@ -181,16 +167,47 @@
 }
 
 /* Style de base pour tous les boutons, états désactivés et actifs spécifiques */
-#assistant1a-form button.custom-button,
-#zone-session button.custom-button {
+/* #zone-session button.custom-button, */
+/* #assistant1a-file, */
+#assistant1a-form button.custom-button {
   /* background-color: #4e5d6c; */
   background-color: #60686f;
+  /* background-color: yellow; */
+  height: 55px;
   color: white;
   padding: 15px 20px;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s, opacity 0.3s;
+  font-size: 12px;
+  margin-right: 8px;
+  /* margin-top: 8px; */
 }
+
+#assistant1a-file {
+  height: 55px;
+  padding: 15px 10px;
+  color: #ffffff;
+  font-size: 12px;
+  margin-right: 8px;
+  background-color: #485563;
+}
+
+#assistant1a-form button.custom-button.assistant1a-cancel-file {
+  margin-right: 0px;
+  /* background-color: yellow; */
+}
+
+/* #assistant1a-file-submit,
+#assistant1a-cancel-file,
+#assistant1a-file,
+#assistant1a-reset {
+  font-size: 12px;
+  margin-right: 8px;
+  margin-top: 8px;
+  background-color: yellow;
+} */
+
 #copyButton,
 #saveButton {
   background-color: #4e5d6c;

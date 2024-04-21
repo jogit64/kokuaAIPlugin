@@ -112,7 +112,9 @@ function assistant1a_shortcode()
 
             <fieldset>
                 <legend>Session utilisateur</legend>
+                <!-- <div id="assistant1a-session-section"> -->
                 <button type="button" id="assistant1a-reset" class="custom-button">Réinitialiser la Session</button>
+                <!-- </div> -->
             </fieldset>
         </div>
 

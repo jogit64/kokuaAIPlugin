@@ -107,6 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
   cancelButton.id = "assistant1a-cancel-file";
   cancelButton.className = "custom-button";
   cancelButton.style.display = "none";
+  cancelButton.classList.add("assistant1a-cancel-file");
   document.getElementById("assistant1a-file-section").appendChild(cancelButton);
 
   // Gestion de l'annulation de la sélection d'un fichier

@@ -18,7 +18,7 @@
 .details-container {
   display: flex;
   justify-content: space-around;
-  margin-top: 10px;
+  /* margin-top: 10px; */
 }
 
 .token-details,
@@ -36,21 +36,23 @@
   border-right: none;
 }
 
-.token-details h3,
+/* .token-details h3,
 .cost-details h3,
 .quality-details h3 {
-  font-size: 14px; /* Taille de texte ajustée pour les sous-titres */
-  margin-bottom: 5px; /* Moins d'espace sous les sous-titres */
+  font-size: 14px;
+  margin-bottom: 5px; 
   font-weight: bold;
-  /* color: red; */
-}
+  /* color: red; 
+} */
 
 #cost-estimate-container h3 {
   font-size: 12px; /* Taille de texte ajustée pour les sous-titres */
   margin-bottom: 5px; /* Moins d'espace sous les sous-titres */
+  font-weight: bold;
+  padding-top: 0px;
 }
 
 #cost-estimate-container p {
   font-size: 12px; /* Uniformisation de la taille de texte */
-  margin: 2px 0; /* Réduction des marges pour un design plus compact */
+  /* margin: 2px 0;  */
 }
