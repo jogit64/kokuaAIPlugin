@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var selectedVoice; // Variable globale pour stocker la voix sélectionnée
   var responseContainer = document.getElementById("assistant1a-response");
   var historyContainer = document.getElementById("assistant1a-history");
+  var costEstimate = document.getElementById("cost-estimate-fieldset");
 
   // var questionText = document
   //   .getElementById("assistant1a-question")
@@ -114,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
   cancelButton.addEventListener("click", function () {
     fileInput.value = ""; // Réinitialise le choix du fichier
     this.style.display = "none"; // Cache le bouton d'annulation
-    document.getElementById("cost-estimate-fieldset").style.display = "none"; // Cache le `fieldset`
+    costEstimate.style.display = "none";
     setButtonStates(); // Met à jour l'état des boutons
   });
 
@@ -122,11 +123,11 @@ document.addEventListener("DOMContentLoaded", function () {
   fileInput.addEventListener("change", function () {
     if (this.files.length > 0) {
       cancelButton.style.display = "block";
-      document.getElementById("cost-estimate-fieldset").style.display = "block"; // Affiche le `fieldset`
+      costEstimate.style.display = "block";
       lastAction = "file";
       setButtonStates(); // Met à jour l'état des boutons
     } else {
-      document.getElementById("cost-estimate-fieldset").style.display = "none"; // Cache le `fieldset` si aucun fichier n'est sélectionné
+      costEstimate.style.display = "none"; // Cache le `fieldset` si aucun fichier n'est sélectionné
     }
   });
 
@@ -175,6 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Vérifier le statut et extraire le contenu approprié
     if (data && data.status === "finished" && data.response !== undefined) {
       setLoadingState(false);
+
       // content = data.response; // Accéder directement à la réponse si la tâche est terminée
       content = removeJsonArtifacts(data.response); // Nettoyer les artefacts JSON
     } else if (data && data.status === "failed") {
@@ -321,12 +323,16 @@ document.addEventListener("DOMContentLoaded", function () {
   function setLoadingState(isLoading, message = "") {
     isRequestPending = isLoading;
     indicator.style.display = isLoading ? "block" : "none";
-    var loadingMessageElement = document.getElementById("loadingMessage"); // Assure-toi que cet élément existe dans ton HTML
+    var loadingMessageElement = document.getElementById("loadingMessage");
+    var staticMessageElement = document.getElementById("staticMessage"); // Element pour le message statique
+
     if (isLoading && message) {
       loadingMessageElement.textContent = message;
       loadingMessageElement.style.display = "block";
+      staticMessageElement.style.display = "block"; // Affiche le message statique quand le loader est actif
     } else {
       loadingMessageElement.style.display = "none";
+      staticMessageElement.style.display = "none"; // Cache le message statique quand le loader n'est pas actif
     }
     setButtonStates();
   }
@@ -340,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         console.log("Task Status:", data);
         if (data.status === "processing") {
-          setLoadingState(true, "Traitement en cours. Veuillez patienter...");
+          setLoadingState(true, "Traitement en cours");
         } else if (data.status === "finished") {
           setLoadingState(false);
           updateResponseContainer(data);
@@ -465,6 +471,8 @@ document.addEventListener("DOMContentLoaded", function () {
     sendRequest(false); // Envoie la demande sans utiliser la voix
     fileInput.value = ""; // Réinitialise le champ de fichier après l'envoi
     cancelButton.style.display = "none"; // Cache le bouton d'annulation après l'envoi du fichier
+    costEstimate.style.display = "none"; // Cache le bouton d'annulation après l'envoi du fichier
+    costEstimate.style.display = "none";
   });
 
   // Écouteur d'événement sur le bouton de microphone pour démarrer la reconnaissance vocale
