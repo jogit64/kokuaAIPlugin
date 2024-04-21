@@ -6,15 +6,26 @@ document.addEventListener("DOMContentLoaded", function () {
   const costEstimatedDisplay = document.getElementById("cost-estimated");
   const qualityDisplay = document.getElementById("quality");
 
-  const maxTokens = 4000; // Limite maximale de tokens comme configuré dans votre fichier JSON
-  const conversionRate = 1 / 1.07; // Taux de conversion de USD à EUR
-  const costPerTokenInputUSD = 30.0 / 1000000; // Coût par token en USD pour l'input
-  const costPerTokenOutputUSD = 60.0 / 1000000; // Coût par token en USD pour l'output
+  const maxTokens = 4000;
+  const conversionRate = 1 / 1.07;
+  const costPerTokenInputUSD = 30.0 / 1000000;
+  const costPerTokenOutputUSD = 60.0 / 1000000;
+
+  if (typeof pdfjsLib !== "undefined") {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.7.570/pdf.worker.min.js";
+  } else {
+    console.error("PDF.js n'est pas chargé.");
+  }
 
   fileInput.addEventListener("change", function () {
     if (this.files.length > 0) {
       const file = this.files[0];
-      analyzeFile(file);
+      if (/\.pdf$/i.test(file.name)) {
+        analyzePDF(file);
+      } else {
+        analyzeFile(file);
+      }
     }
   });
 
@@ -22,13 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const reader = new FileReader();
     reader.onload = function (e) {
       const content = e.target.result;
-      const inputTokens = estimateTokens(content);
-      const outputTokens = estimateOutputTokens(inputTokens); // Estime les tokens de sortie basée sur la règle de 50% de l'input
-      const totalTokens = inputTokens + outputTokens;
-      const costInUSD = calculateCostInUSD(inputTokens, outputTokens);
-      const costInEUR = convertToEUR(costInUSD);
-      const quality = evaluateQuality(totalTokens, maxTokens);
-      updateDisplay(inputTokens, outputTokens, totalTokens, costInEUR, quality);
+      processContent(content);
     };
     reader.onerror = function (e) {
       console.error("Erreur de lecture du fichier : ", e.target.error.message);
@@ -36,31 +41,70 @@ document.addEventListener("DOMContentLoaded", function () {
     reader.readAsText(file);
   }
 
+  function analyzePDF(file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const typedarray = new Uint8Array(e.target.result);
+      pdfjsLib
+        .getDocument(typedarray)
+        .promise.then(function (pdfDoc) {
+          return pdfDoc.getPage(1);
+        })
+        .then(function (page) {
+          return page.getTextContent();
+        })
+        .then(function (textContent) {
+          let text = "";
+          textContent.items.forEach(function (item) {
+            text += item.str + " ";
+          });
+          processContent(text);
+        });
+    };
+    reader.onerror = function (e) {
+      console.error(
+        "Erreur de lecture du fichier PDF : ",
+        e.target.error.message
+      );
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function processContent(content) {
+    const inputTokens = estimateTokens(content);
+    const outputTokens = estimateOutputTokens(inputTokens);
+    const totalTokens = inputTokens + outputTokens;
+    const costInUSD = calculateCostInUSD(inputTokens, outputTokens);
+    const costInEUR = convertToEUR(costInUSD);
+    const quality = evaluateQuality(totalTokens, maxTokens);
+    updateDisplay(inputTokens, outputTokens, totalTokens, costInEUR, quality);
+  }
+
   function estimateTokens(text) {
-    return text.split(/\s+/).length; // Estimation simple du nombre de mots comme tokens
+    return text.split(/\s+/).length;
   }
 
   function estimateOutputTokens(inputTokens) {
-    return Math.min(inputTokens * 0.5, maxTokens - inputTokens); // Estimation simplifiée de l'output, ajustée pour ne pas dépasser maxTokens
+    return Math.min(inputTokens * 0.5, maxTokens - inputTokens);
   }
 
   function calculateCostInUSD(inputTokens, outputTokens) {
     const inputCost = inputTokens * costPerTokenInputUSD;
     const outputCost = outputTokens * costPerTokenOutputUSD;
-    return inputCost + outputCost; // Coût total pour input et output
+    return inputCost + outputCost;
   }
 
   function convertToEUR(costInUSD) {
-    return costInUSD * conversionRate; // Convertit le coût de USD en EUR
+    return costInUSD * conversionRate;
   }
 
   function evaluateQuality(totalTokens, maxTokens) {
     if (totalTokens <= maxTokens) {
-      return "Haute"; // La qualité est haute si on ne dépasse pas la limite
+      return "Haute";
     } else if (totalTokens > maxTokens && totalTokens <= maxTokens * 1.1) {
-      return "Moyenne"; // Qualité moyenne si légèrement au-dessus de la limite
+      return "Moyenne";
     } else {
-      return "Basse"; // Qualité basse si bien au-dessus de la limite
+      return "Basse";
     }
   }
 
