@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var historyContainer = document.getElementById("assistant1a-history");
   var costEstimate = document.getElementById("cost-estimate-fieldset");
   var actionsContainer = document.getElementById("response-actions");
-
+  let globalIsVoice = false;
   // var questionText = document
   //   .getElementById("assistant1a-question")
   //   .value.trim();
@@ -205,78 +205,54 @@ document.addEventListener("DOMContentLoaded", function () {
     historyContainer.style.display = this.checked ? "block" : "none";
   });
 
-  // Met à jour le contenu du conteneur de réponse et gère l'affichage des actions associées.
-  function updateResponseContainer(data) {
-    // Vérifier si les données sont vides ou non valides avant de continuer
+  function updateResponseContainer(data, isVoice) {
+    // Vérifier si les données reçues sont vides ou non valides
     if (!data || data === "" || Object.keys(data).length === 0) {
       console.log("No valid data provided to updateResponseContainer.");
-      return; // Retourne immédiatement si aucune donnée valide n'est fournie
+      return; // Stoppe l'exécution si les données ne sont pas valides
     }
-    console.log("Received data:", JSON.stringify(data, null, 2)); // Afficher les données de manière lisible
+    console.log("Received data:", JSON.stringify(data, null, 2)); // Affiche les données reçues
 
     let content = "";
 
-    // Vérifier le statut et extraire le contenu approprié
+    // Analyse le statut de la réponse pour déterminer la suite des actions
     if (data && data.status === "finished" && data.response !== undefined) {
-      setLoadingState(false);
+      setLoadingState(false); // Arrête l'indication de chargement
+      content = removeJsonArtifacts(data.response); // Nettoie les artefacts JSON de la réponse
 
-      // content = data.response; // Accéder directement à la réponse si la tâche est terminée
-      content = removeJsonArtifacts(data.response); // Nettoyer les artefacts JSON
+      // Lorsque la tâche est terminée, la réponse est traitée pour affichage
     } else if (data && data.status === "failed") {
+      // En cas d'échec de la tâche
       console.error("Job failed:", data.error, data.details);
-      content = "Erreur de traitement : " + data.error;
+      content = "Erreur de traitement : " + data.error; // Prépare le message d'erreur
     } else if (data && data.status === "processing") {
+      // Si la tâche est toujours en cours
       console.log("Job is still processing.");
-      content = "Traitement en cours...";
+      content = "Traitement en cours..."; // Informe l'utilisateur que la tâche est en cours
     } else {
+      // Si la structure des données reçues n'est pas celle attendue
       console.error("Unexpected data structure:", data);
-      content = "Réponse inattendue du serveur.";
+      content = "Réponse inattendue du serveur."; // Message pour une structure de données inattendue
     }
 
-    // // Si la réponse est bien une chaîne mais contient des caractères de format JSON, nettoyez-la
-    // if (typeof content === "string") {
-    //   content = removeJsonArtifacts(content);
-    // } else {
-    //   content = JSON.stringify(content); // Convertir l'objet en chaîne si nécessaire
-    // }
+    var formattedContent = formatLists(content); // Applique un formatage aux listes si nécessaire
 
-    var formattedContent = formatLists(content); // Formate les listes si nécessaire
-    // var responseContainer = document.getElementById("assistant1a-response");
-    // var questionText = document
-    //   .getElementById("assistant1a-question")
-    //   .value.trim();
-
-    // var actionsContainer = document.getElementById("response-actions");
-    // var historyContainer = document.getElementById("assistant1a-history");
-
-    // Affiche la réponse actuelle dans le conteneur de réponse
+    // Met à jour le contenu du conteneur de réponse avec la réponse formatée
     if (formattedContent.trim() !== "") {
-      responseContainer.innerHTML = formattedContent;
-      responseContainer.style.display = "block";
-      actionsContainer.style.display = "block";
-      addHistoryEntry("", formattedContent, "response");
-      setButtonStates();
+      responseContainer.innerHTML = formattedContent; // Met à jour le HTML du conteneur de réponse
+      responseContainer.style.display = "block"; // Assure que le conteneur de réponse est visible
+      actionsContainer.style.display = "block"; // Affiche les actions possibles pour l'utilisateur
+      addHistoryEntry("", formattedContent, "response"); // Ajoute cette réponse à l'historique
+      setButtonStates(); // Met à jour les états des boutons selon le nouveau contexte
     } else {
+      // Si le contenu formaté est vide, cache le conteneur de réponse et les actions
       responseContainer.style.display = "none";
       actionsContainer.style.display = "none";
     }
 
-    // ! AJOUT HISTOTIQUE
-    // Ajoute la question à l'historique, sans préfixe dans le texte
-    // if (questionText && !isFirstExchange) {
-    // if (questionText) {
-    //   addHistoryEntry(questionText, "", "question");
-    // }
-
-    // Ajoute la réponse à l'historique, sans préfixe dans le texte
-    // if (formattedContent.trim() !== "" && !isFirstExchange) {
-    // if (formattedContent.trim() !== "") {
-    //   addHistoryEntry("", formattedContent, "response");
-    // }
-    // ! FIN AJOUT HISTOTIQUE
-
-    // Le premier échange est maintenant passé, on actualise l'indicateur
-    // isFirstExchange = false;
+    if (formattedContent.trim() !== "" && isVoice) {
+      speak(formattedContent);
+    }
   }
 
   function removeJsonArtifacts(text) {
@@ -350,7 +326,6 @@ document.addEventListener("DOMContentLoaded", function () {
       "assistant1a-response"
     ).innerText;
     if (responseText.trim().length > 0) {
-      console.log("passé par là");
       console.log("responseText est :", responseText);
       copyButton.disabled = false;
       saveButton.disabled = false;
@@ -396,7 +371,8 @@ document.addEventListener("DOMContentLoaded", function () {
           setLoadingState(true, "- TRAITEMENT EN COURS -");
         } else if (data.status === "finished") {
           setLoadingState(false);
-          updateResponseContainer(data);
+          updateResponseContainer(data, globalIsVoice);
+
           clearInterval(checkInterval); // Arrête l'intervalle lorsque le travail est terminé
         } else if (data.status === "failed") {
           setLoadingState(
@@ -433,6 +409,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Envoie une requête au serveur
   function sendRequest(isVoice = false) {
+    globalIsVoice = isVoice;
+    console.log("sendRequest called with isVoice:", isVoice);
     if (isRequestPending) return;
     setLoadingState(true);
 
@@ -472,7 +450,8 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log("Session ID: ", data.session_id); // Affiche l'ID de session dans la console
           startTaskStatusCheck(data.job_id); // Démarrez la vérification de l'état avec l'ID de job obtenu
         } else {
-          updateResponseContainer(data);
+          updateResponseContainer(data, isVoice);
+
           if (isVoice) {
             speak(data.response); // Continuez à gérer la synthèse vocale si nécessaire
           }
@@ -573,7 +552,9 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Local speech synthesis has ended."); // Log de fin de parole
       handleSpeechEnd();
     };
+    isSpeaking = true; // Mettre à jour l'état de parole
     synth.speak(utterThis);
+    setButtonStates(); // Mise à jour des états des boutons immédiatement
   }
 
   // Fonction pour gérer la fin de la parole
@@ -584,6 +565,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // setButtonStates();
     microButton.disabled = false;
     questionInput.value = "";
+    isSpeaking = false; // Réinitialiser l'état de parole
+    setButtonStates(); // Mise à jour des états des boutons après la fin de la parole
   }
 
   // todo ESPACE REINITIALISATION ----------------------
@@ -612,6 +595,8 @@ document.addEventListener("DOMContentLoaded", function () {
     updateResponseContainer(""); // Met à jour le conteneur de réponse, fonction non fournie
     cancelButton.style.display = "none";
     actionsContainer.style.display = "none";
+
+    isSpeaking = false;
 
     lastAction = null;
     setButtonStates(); // Met à jour l'état des boutons, fonction non fournie
