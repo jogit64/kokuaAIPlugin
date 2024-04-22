@@ -212,31 +212,36 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function updateResponseContainer(data, isVoice) {
-    // Vérifier si les données reçues sont vides ou non valides
-    if (!data || data === "" || Object.keys(data).length === 0) {
+    // Vérifie si les données reçues sont vides ou non valides
+    if (
+      !data ||
+      data === "" ||
+      typeof data !== "object" ||
+      Object.keys(data).length === 0
+    ) {
       console.log("No valid data provided to updateResponseContainer.");
+      responseContainer.innerHTML = "Aucune donnée valide reçue du serveur.";
       return; // Stoppe l'exécution si les données ne sont pas valides
     }
-    console.log("Received data:", JSON.stringify(data, null, 2)); // Affiche les données reçues
+
+    console.log("Received data:", JSON.stringify(data, null, 2)); // Log des données reçues pour le débogage
 
     let content = "";
 
-    // Analyse le statut de la réponse pour déterminer la suite des actions
-    if (data && data.status === "finished" && data.response !== undefined) {
+    // Gère les différents statuts de réponse pour les tâches asynchrones et les réponses directes
+    if (data.status === "finished" && data.response !== undefined) {
       setLoadingState(false); // Arrête l'indication de chargement
       content = removeJsonArtifacts(data.response); // Nettoie les artefacts JSON de la réponse
-
-      // Lorsque la tâche est terminée, la réponse est traitée pour affichage
-    } else if (data && data.status === "failed") {
-      // En cas d'échec de la tâche
+    } else if (data.status === "failed") {
       console.error("Job failed:", data.error, data.details);
       content = "Erreur de traitement : " + data.error; // Prépare le message d'erreur
-    } else if (data && data.status === "processing") {
-      // Si la tâche est toujours en cours
+    } else if (data.status === "processing") {
       console.log("Job is still processing.");
       content = "Traitement en cours..."; // Informe l'utilisateur que la tâche est en cours
+    } else if (data.response) {
+      // Pour les réponses directes sans statut de tâche
+      content = removeJsonArtifacts(data.response);
     } else {
-      // Si la structure des données reçues n'est pas celle attendue
       console.error("Unexpected data structure:", data);
       content = "Réponse inattendue du serveur."; // Message pour une structure de données inattendue
     }
@@ -245,17 +250,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Met à jour le contenu du conteneur de réponse avec la réponse formatée
     if (formattedContent.trim() !== "") {
-      responseContainer.innerHTML = formattedContent; // Met à jour le HTML du conteneur de réponse
-      responseContainer.style.display = "block"; // Assure que le conteneur de réponse est visible
-      actionsContainer.style.display = "block"; // Affiche les actions possibles pour l'utilisateur
-      addHistoryEntry("", formattedContent, "response"); // Ajoute cette réponse à l'historique
-      setButtonStates(); // Met à jour les états des boutons selon le nouveau contexte
+      responseContainer.innerHTML = formattedContent;
+      responseContainer.style.display = "block";
+      actionsContainer.style.display = "block";
+      addHistoryEntry("", formattedContent, "response");
+      setButtonStates();
     } else {
-      // Si le contenu formaté est vide, cache le conteneur de réponse et les actions
       responseContainer.style.display = "none";
       actionsContainer.style.display = "none";
     }
 
+    // Utilise la synthèse vocale si nécessaire
     if (formattedContent.trim() !== "" && isVoice) {
       speak(formattedContent);
     }
@@ -334,7 +339,6 @@ document.addEventListener("DOMContentLoaded", function () {
       "assistant1a-response"
     ).innerText;
     if (responseText.trim().length > 0) {
-      console.log("responseText est :", responseText);
       copyButton.disabled = false;
       saveButton.disabled = false;
     }
@@ -425,6 +429,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Préparation des données à envoyer
     var formData = new FormData();
+    var questionText = questionInput.value.trim(); // Assurez-vous que questionText est définie
+    var file = fileInput.files.length > 0 ? fileInput.files[0] : null;
 
     if (fileInput.files.length > 0) {
       formData.append("file", fileInput.files[0]);
@@ -443,8 +449,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("Config sélectionnée :", selectedConfig);
 
+    // Décidez si la demande doit être synchrone ou asynchrone
+    const isHeavy = evaluateRequestSize(questionText, file);
+    const endpoint = isHeavy
+      ? "https://kokua060424-caea7e92447d.herokuapp.com/ask"
+      : "https://kokua060424-caea7e92447d.herokuapp.com/ask_sync";
+
     // Envoi de la requête au serveur et gestion des réponses
-    fetch("https://kokua060424-caea7e92447d.herokuapp.com/ask", {
+    fetch(endpoint, {
       method: "POST",
       body: formData,
       credentials: "include",
@@ -456,15 +468,19 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json();
       })
       .then((data) => {
-        if (data.job_id) {
-          console.log("Session ID: ", data.session_id); // Affiche l'ID de session dans la console
-          startTaskStatusCheck(data.job_id); // Démarrez la vérification de l'état avec l'ID de job obtenu
+        if (isHeavy) {
+          // Gérer la réponse pour la tâche asynchrone
+          console.log("Session ID: ", data.session_id);
+          console.log("TRAITEMENT ASYNCHRONE");
+          startTaskStatusCheck(data.job_id);
         } else {
+          // Gérer immédiatement la réponse pour la tâche synchrone
+          console.log("TRAITEMENT SYNCHRONE");
           updateResponseContainer(data, isVoice);
-
           if (isVoice) {
-            speak(data.response); // Continuez à gérer la synthèse vocale si nécessaire
+            speak(data.response);
           }
+          setLoadingState(false);
         }
       })
       .catch((error) => {
@@ -473,6 +489,7 @@ document.addEventListener("DOMContentLoaded", function () {
           "Une erreur s'est produite lors de la communication avec le serveur. Veuillez réessayer."
         );
         updateResponseContainer("Erreur lors de la requête.");
+        setLoadingState(false);
       })
       .finally(() => {
         // setLoadingState(false);
@@ -579,6 +596,24 @@ document.addEventListener("DOMContentLoaded", function () {
     setButtonStates(); // Mise à jour des états des boutons après la fin de la parole
   }
 
+  // todo ESPACE EVALUATIONSYNCH ou ASYNCH -------------
+
+  function evaluateRequestSize(questionText, file) {
+    const textLength = questionText.trim().length;
+    let fileSize = 0;
+    if (file && file.size) {
+      fileSize = file.size / 1024; // Taille du fichier en kilo-octets
+    }
+
+    // Définissez des seuils pour considérer une demande comme "lourde"
+    const heavyTextLength = 100; // par exemple, plus de 1000 caractères
+    const heavyFileSize = 10; // par exemple, plus de 500 KB
+
+    return textLength > heavyTextLength || fileSize > heavyFileSize;
+  }
+
+  // todo FIN ESPACE EVALUATIONSYNCH ou ASYNCH ---------
+
   // todo ESPACE REINITIALISATION ----------------------
   // Fonction pour réinitialiser la session sur le serveur
   function resetSession() {
@@ -595,8 +630,6 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((error) => console.error("Erreur:", error)); // Log en cas d'erreur de réseau ou serveur
   }
-
-  // todo FIN ESPACE REINITIALISATION ------------------
 
   // Réinitialise l'interface utilisateur
   function resetUI() {
@@ -658,6 +691,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .querySelector('.zone-radio input[type="radio"]:checked')
       .dispatchEvent(new Event("change"));
   });
+  // todo FIN ESPACE REINITIALISATION ------------------
 
   resetUI();
 });
