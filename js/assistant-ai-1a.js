@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var costEstimate = document.getElementById("cost-estimate-fieldset");
   var actionsContainer = document.getElementById("response-actions");
   let globalIsVoice = false;
+  var interactionStarted = false;
   // var questionText = document
   //   .getElementById("assistant1a-question")
   //   .value.trim();
@@ -64,6 +65,11 @@ document.addEventListener("DOMContentLoaded", function () {
       elementStyle: originalStyle,
       titleStyles: Array.from(titles).map((title) => title.style.color),
     };
+  }
+
+  function setInteractionStarted(started) {
+    interactionStarted = started;
+    setButtonStates(); // Mise à jour de l'état des boutons chaque fois que l'état d'interaction change
   }
 
   function restoreOriginalStyle(element, styles) {
@@ -319,7 +325,9 @@ document.addEventListener("DOMContentLoaded", function () {
       cancelButton.style.display = hasFile ? "block" : "none";
     }
     stopButton.disabled = !isSpeaking;
-    resetButton.disabled = lastAction === null && !isSpeaking;
+    // resetButton.disabled = lastAction === null && !isSpeaking;
+    resetButton.disabled =
+      !interactionStarted || isSpeaking || isRequestPending;
 
     // Active les boutons de copie et de sauvegarde si du texte est présent dans la réponse
     var responseText = document.getElementById(
@@ -410,12 +418,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // Envoie une requête au serveur
   function sendRequest(isVoice = false) {
     globalIsVoice = isVoice;
+    setInteractionStarted(true);
     console.log("sendRequest called with isVoice:", isVoice);
     if (isRequestPending) return;
     setLoadingState(true);
 
     // Préparation des données à envoyer
     var formData = new FormData();
+
     if (fileInput.files.length > 0) {
       formData.append("file", fileInput.files[0]);
     }
