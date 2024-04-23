@@ -72,8 +72,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function processContent(content) {
     const inputTokens = estimateTokens(content);
+    const instructionTokens = estimateInstructionTokens(); // Estime les tokens pour les instructions
     const outputTokens = estimateOutputTokens(inputTokens);
-    const totalTokens = inputTokens + outputTokens;
+    const totalTokens = inputTokens + outputTokens + instructionTokens;
     const costInUSD = calculateCostInUSD(inputTokens, outputTokens);
     const costInEUR = convertToEUR(costInUSD);
     const quality = evaluateQuality(totalTokens, maxTokens);
@@ -81,7 +82,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function estimateTokens(text) {
-    return text.split(/\s+/).length;
+    // return text.split(/\s+/).length;
+    const tokens = text.match(/[\w']+|[\s.,!?;]/g);
+    return tokens ? tokens.length : 0;
+  }
+
+  // Mise à jour de la fonction pour mieux refléter la complexité des instructions
+  function estimateInstructionTokens() {
+    const instructions = `Tu es expert en prévention des risques professionnels... Mentionne en titre de ta réponse le nom du document et le cas échéant sa date de réalisation.`;
+    return estimateTokens(instructions);
   }
 
   function estimateOutputTokens(inputTokens) {
