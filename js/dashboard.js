@@ -6,38 +6,71 @@ document.addEventListener("DOMContentLoaded", function () {
   const costEstimatedDisplay = document.getElementById("cost-estimated");
   const qualityDisplay = document.getElementById("quality");
 
-  const maxTokens = 4000;
+  let maxTokens = 4000; // Valeur initiale par défaut, sera mise à jour dynamiquement
   const conversionRate = 1 / 1.07;
   const costPerTokenInputUSD = 30.0 / 1000000;
   const costPerTokenOutputUSD = 60.0 / 1000000;
+  let currentContent = null; // Pour stocker le contenu actuel et retraiter si nécessaire
 
-  if (typeof pdfjsLib !== "undefined") {
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.7.570/pdf.worker.min.js";
-  } else {
-    console.error("PDF.js n'est pas chargé.");
-  }
+  // Chargement initial des configurations
+  fetchConfigurations();
+
+  // Écouter les changements sur les boutons radio
+  document
+    .querySelectorAll('input[type="radio"][name="config"]')
+    .forEach((radio) => {
+      radio.addEventListener("change", function () {
+        if (this.checked) {
+          updateConfig(this.value);
+        }
+      });
+    });
 
   fileInput.addEventListener("change", function () {
     if (this.files.length > 0) {
       const file = this.files[0];
-      if (/\.pdf$/i.test(file.name)) {
-        analyzePDF(file);
-      } else {
-        analyzeFile(file);
-      }
+      currentContent = null; // Réinitialiser le contenu actuel
+      const fileHandler = file.name.endsWith(".pdf") ? analyzePDF : analyzeFile;
+      fileHandler(file);
     }
   });
 
+  function fetchConfigurations() {
+    fetch(dashboardSettings.baseUrl + "data/gpt_config.json")
+      .then((response) => response.json())
+      .then((data) => {
+        configurations = data;
+        const initialConfig = document.querySelector(
+          'input[name="config"]:checked'
+        ).value;
+        updateConfig(initialConfig);
+      })
+      .catch((error) => console.error("Error loading JSON:", error));
+  }
+
+  function updateConfig(configType) {
+    const config = configurations[configType];
+    maxTokens = config.max_tokens;
+    const maxTokensDisplay = document.getElementById("max-tokens-display");
+
+    if (maxTokensDisplay) {
+      maxTokensDisplay.textContent = `Max tokens: ${maxTokens}`;
+      if (currentContent) {
+        processContent(currentContent);
+      }
+    } else {
+      console.error("Element '#max-tokens-display' not found.");
+    }
+  }
+
   function analyzeFile(file) {
     const reader = new FileReader();
-    reader.onload = function (e) {
-      const content = e.target.result;
-      processContent(content);
+    reader.onload = (e) => {
+      currentContent = e.target.result;
+      processContent(currentContent);
     };
-    reader.onerror = function (e) {
+    reader.onerror = (e) =>
       console.error("Erreur de lecture du fichier : ", e.target.error.message);
-    };
     reader.readAsText(file);
   }
 
@@ -47,32 +80,24 @@ document.addEventListener("DOMContentLoaded", function () {
       const typedarray = new Uint8Array(e.target.result);
       pdfjsLib
         .getDocument(typedarray)
-        .promise.then(function (pdfDoc) {
-          return pdfDoc.getPage(1);
-        })
-        .then(function (page) {
-          return page.getTextContent();
-        })
-        .then(function (textContent) {
-          let text = "";
-          textContent.items.forEach(function (item) {
-            text += item.str + " ";
-          });
-          processContent(text);
+        .promise.then((pdfDoc) => pdfDoc.getPage(1))
+        .then((page) => page.getTextContent())
+        .then((textContent) => {
+          currentContent = textContent.items.map((item) => item.str).join(" ");
+          processContent(currentContent);
         });
     };
-    reader.onerror = function (e) {
+    reader.onerror = (e) =>
       console.error(
         "Erreur de lecture du fichier PDF : ",
         e.target.error.message
       );
-    };
     reader.readAsArrayBuffer(file);
   }
 
   function processContent(content) {
     const inputTokens = estimateTokens(content);
-    const instructionTokens = estimateInstructionTokens(); // Estime les tokens pour les instructions
+    const instructionTokens = estimateInstructionTokens();
     const outputTokens = estimateOutputTokens(inputTokens);
     const totalTokens = inputTokens + outputTokens + instructionTokens;
     const costInUSD = calculateCostInUSD(inputTokens, outputTokens);
@@ -81,13 +106,39 @@ document.addEventListener("DOMContentLoaded", function () {
     updateDisplay(inputTokens, outputTokens, totalTokens, costInEUR, quality);
   }
 
+  function updateDisplay(
+    inputTokens,
+    outputTokens,
+    totalTokens,
+    costInEUR,
+    quality
+  ) {
+    tokenInputDisplay.textContent = inputTokens;
+    tokenOutputDisplay.textContent = outputTokens;
+    tokenTotalDisplay.textContent = totalTokens;
+    costEstimatedDisplay.textContent = `€${costInEUR.toFixed(2)}`;
+    qualityDisplay.textContent = quality;
+    updateProgressBar(totalTokens, maxTokens);
+  }
+
+  function updateProgressBar(totalTokens, maxTokens) {
+    const percentage = (totalTokens / maxTokens) * 100;
+    const progressBar = document.getElementById("token-progress");
+    progressBar.style.width = percentage + "%";
+    progressBar.style.backgroundColor =
+      percentage < 75 ? "#4CAF50" : percentage < 90 ? "#FFEB3B" : "#F44336";
+    document.getElementById(
+      "token-status"
+    ).textContent = `Utilisation de ${Math.round(
+      totalTokens
+    )} sur ${maxTokens} tokens (${Math.round(percentage)}%)`;
+  }
+
   function estimateTokens(text) {
-    // return text.split(/\s+/).length;
     const tokens = text.match(/[\w']+|[\s.,!?;]/g);
     return tokens ? tokens.length : 0;
   }
 
-  // Mise à jour de la fonction pour mieux refléter la complexité des instructions
   function estimateInstructionTokens() {
     const instructions = `Tu es expert en prévention des risques professionnels... Mentionne en titre de ta réponse le nom du document et le cas échéant sa date de réalisation.`;
     return estimateTokens(instructions);
@@ -108,26 +159,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function evaluateQuality(totalTokens, maxTokens) {
-    if (totalTokens <= maxTokens) {
+    const usageRatio = totalTokens / maxTokens;
+    if (usageRatio <= 0.75) {
       return "Haute";
-    } else if (totalTokens > maxTokens && totalTokens <= maxTokens * 1.1) {
+    } else if (usageRatio <= 0.9) {
       return "Moyenne";
     } else {
       return "Basse";
     }
-  }
-
-  function updateDisplay(
-    inputTokens,
-    outputTokens,
-    totalTokens,
-    costInEUR,
-    quality
-  ) {
-    tokenInputDisplay.textContent = inputTokens;
-    tokenOutputDisplay.textContent = outputTokens;
-    tokenTotalDisplay.textContent = totalTokens;
-    costEstimatedDisplay.textContent = `€${costInEUR.toFixed(2)}`;
-    qualityDisplay.textContent = quality;
   }
 });
