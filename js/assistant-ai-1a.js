@@ -24,10 +24,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const instructionDiv = document.getElementById("instructionText");
 
   const consignes = {
-    salarie: "Copiez et collez l'entretien ou importez un fichier (DOC, DOCX).",
+    salarie:
+      "Copiez et collez l'entretien ou importez un fichier (DOC, DOCX, TXT).",
     direction:
-      "Copiez et collez l'entretien ou importez un fichier (DOC, DOCX).",
-    document: "Importez le fichier (PDF) à analyser pour cette session.",
+      "Copiez et collez l'entretien ou importez un fichier (DOC, DOCX, TXT).",
+    document: "Importez le fichier (PDF) à analyser.",
     mp3: "Utilisez l'importation de fichier pour partager l'enregistrement MP3 à transcrire.",
     discussion:
       "Utilisez cet espace pour discuter de la rédaction et de la structuration de votre rapport.",
@@ -261,9 +262,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Utilise la synthèse vocale si nécessaire
-    if (formattedContent.trim() !== "" && isVoice) {
-      speak(formattedContent);
-    }
+    // if (formattedContent.trim() !== "" && isVoice) {
+    //   speak(formattedContent);
+    // }
   }
 
   function removeJsonArtifacts(text) {
