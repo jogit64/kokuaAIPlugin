@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let maxTokens = 4000; // Valeur initiale par défaut, sera mise à jour dynamiquement
   const conversionRate = 1 / 1.07;
-  const costPerTokenInputUSD = 30.0 / 1000000;
-  const costPerTokenOutputUSD = 60.0 / 1000000;
+  const costPerTokenInputUSD = 10.0 / 1000000;
+  const costPerTokenOutputUSD = 30.0 / 1000000;
   let currentContent = null; // Pour stocker le contenu actuel et retraiter si nécessaire
 
   // Chargement initial des configurations
