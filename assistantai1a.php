@@ -161,7 +161,7 @@ function assistant1a_shortcode()
                                     <div id="token-progress"
                                         style="height: 100%; width: 0%; background-color: #4CAF50;"></div>
                                 </div>
-                                <p id="token-status" style="font-size: 0.8em; margin-top: 5px; color: #666;">Statut des
+                                <p id="token-status">Statut des
                                     tokens non disponible</p>
                             </div>
 

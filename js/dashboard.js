@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (maxTokensDisplay) {
       maxTokensDisplay.textContent = `Max tokens: ${maxTokens}`;
+      maxTokensDisplay.style.color = "white";
       if (currentContent) {
         processContent(currentContent);
       }
@@ -132,6 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ).textContent = `Utilisation de ${Math.round(
       totalTokens
     )} sur ${maxTokens} tokens (${Math.round(percentage)}%)`;
+    tokenStatus.style.color = "white";
   }
 
   function estimateTokens(text) {
