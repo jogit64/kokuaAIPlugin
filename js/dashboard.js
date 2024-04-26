@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const costPerTokenOutputUSD = 30.0 / 1000000;
   let currentContent = null; // Pour stocker le contenu actuel et retraiter si nécessaire
 
+  const tokenStatus = document.getElementById("token-status");
+
   // Chargement initial des configurations
   fetchConfigurations();
 
