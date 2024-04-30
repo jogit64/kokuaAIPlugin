@@ -118,8 +118,8 @@ function assistant1a_shortcode()
                 <div class="zone-radio">
                     <label><input type="radio" name="config" value="salarie" checked> Entretien salarié</label><br>
                     <label><input type="radio" name="config" value="direction"> Entretien direction</label><br>
+                    <!-- <label><input type="radio" name="config" value="mp3"> Transcription audio</label><br> -->
                     <label><input type="radio" name="config" value="document"> Analyse documentaire</label><br>
-                    <label><input type="radio" name="config" value="mp3"> Transcription audio</label><br>
                     <label><input type="radio" name="config" value="discussion"> Rédaction</label><br>
 
                 </div>
