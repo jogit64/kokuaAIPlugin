@@ -606,9 +606,9 @@ document.addEventListener("DOMContentLoaded", function () {
       fileSize = file.size / 1024; // Taille du fichier en kilo-octets
     }
 
-    // Définissez des seuils pour considérer une demande comme "lourde"
-    const heavyTextLength = 100; // par exemple, plus de 1000 caractères
-    const heavyFileSize = 10; // par exemple, plus de 500 KB
+    // Ajuster les seuils pour considérer une demande comme "lourde"
+    const heavyTextLength = 300; // Augmenter la limite textuelle à 300 caractères
+    const heavyFileSize = 512; // Augmenter la limite de taille de fichier à 512 KB
 
     return textLength > heavyTextLength || fileSize > heavyFileSize;
   }
