@@ -233,6 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (data.status === "finished" && data.response !== undefined) {
       setLoadingState(false); // Arrête l'indication de chargement
       content = removeJsonArtifacts(data.response); // Nettoie les artefacts JSON de la réponse
+      questionInput.value = "";
     } else if (data.status === "failed") {
       console.error("Job failed:", data.error, data.details);
       content = "Erreur de traitement : " + data.error; // Prépare le message d'erreur
