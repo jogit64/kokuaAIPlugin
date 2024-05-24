@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var historyContainer = document.getElementById("assistant1a-history");
   var costEstimate = document.getElementById("cost-estimate-fieldset");
   var actionsContainer = document.getElementById("response-actions");
+
   let globalIsVoice = false;
   var interactionStarted = false;
   // var questionText = document
@@ -609,7 +610,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Ajuster les seuils pour considérer une demande comme "lourde"
     const heavyTextLength = 300; // Augmenter la limite textuelle à 300 caractères
-    const heavyFileSize = 512; // Augmenter la limite de taille de fichier à 512 KB
+    const heavyFileSize = 10; // Augmenter la limite de taille de fichier à 512 KB
 
     return textLength > heavyTextLength || fileSize > heavyFileSize;
   }
